@@ -2,3 +2,27 @@
     background: #E2E2E2;
     height: 900px;
 }
+
+.table-first-col{
+    width: 40%
+}
+
+.appointment-table-col{
+    width: 20%
+}
+
+.servicessheet-table-col{
+    width: 30%
+}
+
+.title{
+    font-size: clamp(20px, 2vw, 24px)
+}
+
+.subtitle{
+    font-size: clamp(16px, 2vw, 20px)
+}
+
+.text{
+    font-size: clamp(12px, 2vw, 16px)
+}
