@@ -1,8 +1,16 @@
-#area{
+.area{
     background: #E2E2E2;
-    height: 900px;
+    height:100%
 }
 
+#main-header, #main-footer{
+    height:5vh;
+    background:  #E2E2E2;
+}
+
+#main-body{
+    height:100vh;
+}
 .table-first-col{
     width: 40%
 }
@@ -11,7 +19,7 @@
     width: 20%
 }
 
-.servicessheet-table-col{
+.service-sheet-table-col{
     width: 30%
 }
 

@@ -5,14 +5,14 @@
 <div class="pt-4 pb-2">
     <div class="row pt-1">
         <div class="col">
-            <input class="form-control" type="text" placeholder="Search" style="width: 32vw">
+            <input id="search" class="form-control" type="text" placeholder="Search" style="width: 32vw" onchange="search()" value="{{kw}}">
         </div>
         <div class="col pt-1">
             <ul class="pagination justify-content-end col pagination-sm">
                 <li class="page-item"><a class="page-link" href="#"><</a></li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                {%for i in range(1, pages+1)%}
+                    <li class="page-item"><a class="page-link" href="/?page={{i}}">{{i}}</a></li>
+                {%endfor%}
                 <li class="page-item"><a class="page-link" href="#">></a></li>
             </ul>
         </div>
@@ -29,16 +29,23 @@
                 <th class="appointment-table-col">
                     <div class="dropdown-toggle" data-bs-toggle="dropdown">Trạng thái <br> lịch hẹn</div>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Tablet</a></li>
-                        <li><a class="dropdown-item" href="#">Smartphone</a></li>
+                        <li><a class="dropdown-item" href="#">Tất cả trạng thái</a></li>
+                        <li><a class="dropdown-item" href="#">Trạng thái 1</a></li>
+                        <li><a class="dropdown-item" href="#">Trạng thái 2</a></li>
                     </ul>
                 </th>
             </tr>
         </thead>
         <tbody class="table-light">
-            <tr>
+            <tr onclick="displayAppointmentDetail(1)">
                 <td class="table-first-col">John</td>
                 <td class="appointment-table-col">Doe</td>
+                <td class="appointment-table-col">com</td>
+                <td class="appointment-table-col">com</td>
+            </tr>
+        <tr onclick="displayAppointmentDetail(2)">
+                <td class="table-first-col">Role</td>
+                <td class="appointment-table-col">Anna</td>
                 <td class="appointment-table-col">com</td>
                 <td class="appointment-table-col">com</td>
             </tr>
@@ -49,56 +56,69 @@
 {%endblock%}
 
 {%block rightcontent%}
-<div class="position-absolute translate-middle-y fw-bolder title">Chi tiết lịch hẹn</div>
-<button type="button" class="btn btn-dark d-flex align-items-center
-    justify-content-center me-4 position-absolute end-0 translate-middle-y"
-    style="width: 25px; height: 25px">&#10005</button>
-<div class="container pt-4 pb-2">
-    <div class="pt-2 pb-2">
-        <div class="subtitle">Khách hàng:</div>
-        <div class="row text">
-            <div class="col">Email:</div>
-            <div class="col">Số điện thoại:</div>
-        </div>
-        <div class="text">Thời gian gửi yêu cầu đặt lịch:</div>
-        <div class="row text">
-            <div class="col">Lịch hẹn ngày:</div>
-            <div class="col">lúc:</div>
-        </div>
-    </div>
-    <div class="container position-relative mt-4" style="background: #B2B2B2">
-        <div class="position-absolute translate-middle-y fw-bolder subtitle">Ghi chú</div>
-        <div class="pt-3 pb-1">
-            <textarea class="form-control border-0" rows="2" id="comment" name="text" style="background: #B2B2B2" readonly></textarea>
-        </div>
-    </div>
-    <div class="container position-relative mt-4" style="background: white">
-        <div class="row position-absolute translate-middle-y" style="width: 90%">
-            <div class="col fw-bold text-nowrap subtitle">Dịch vụ</div>
-            <div class="col fw-bold text-nowrap subtitle">Kỹ thuật viên</div>
-        </div>
-        <div class="pt-4">
-            <div class="ps-1" style="height: 150px; max-height: 150px; overflow-y: auto">
-                <div class="row g-2 pt-1 pb-1 align-items-center" style="width: 95%">
-                    <select class="form-select col me-3">
-                        <option>1</option>
-                    </select>
-                    <select class="form-select col ms-3 me-3">
-                        <option>1</option>
-                    </select>
-                    <button class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 25px; height: 25px">&#10005</button>
-                </div>
+{%if id!=0%}
+<div id="appointment-detail" class="container position-relative area">
+    <div class="position-absolute translate-middle-y fw-bolder title">Chi tiết lịch hẹn</div>
+    <button type="button" class="btn btn-dark d-flex align-items-center
+        justify-content-center me-4 position-absolute end-0 translate-middle-y"
+        style="width: 25px; height: 25px" onclick="closeAppointmentDetail()">&times;</button>
+    <div class="container pt-4 pb-2">
+        <div class="pt-2 pb-2">
+            <div class="subtitle">Khách hàng:</div>
+            <div class="row text">
+                <div class="col">Email:</div>
+                <div class="col">Số điện thoại:</div>
+            </div>
+            <div class="text">Thời gian gửi yêu cầu đặt lịch:</div>
+            <div class="row text">
+                <div class="col">Lịch hẹn ngày:</div>
+                <div class="col">lúc:</div>
             </div>
         </div>
-        <div class="row p-3 border-top border-3" style="background: white">
-            <button class="btn btn-dark btn-sm col-md-5 text-nowrap text">Thêm dịch vụ</button>
-            <div class="col text-end align-middle col-md text">Trạng thái lịch hẹn: </div>
+        <div class="container position-relative mt-4" style="background: #B2B2B2">
+            <div class="position-absolute translate-middle-y fw-bolder subtitle">Ghi chú</div>
+            <div class="pt-3 pb-1">
+                <textarea class="form-control border-0" rows="2" id="comment" name="text" style="background: #B2B2B2" readonly></textarea>
+            </div>
+        </div>
+        <div class="container position-relative mt-4" style="background: white">
+            <div class="row position-absolute translate-middle-y" style="width: 90%">
+                <div class="col fw-bold text-nowrap subtitle">Dịch vụ</div>
+                <div class="col fw-bold text-nowrap subtitle">Kỹ thuật viên</div>
+            </div>
+            <div class="pt-4">
+                <div class="ps-1" style="height: 150px; max-height: 150px; overflow-y: auto" id="addArea">
+                    <div class="row g-2 pt-1 pb-1 align-items-center" style="width: 95%">
+                        <select class="form-select col me-3" name="selectService" disabled>
+                            <option>Massage</option>
+                        </select>
+                        <select class="form-select col ms-3 me-3" name="selectTherapist" disabled>
+                            <option>John</option>
+                        </select>
+                        <button class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 25px; height: 25px; visibility: hidden" name="remove" onclick="removeService(this)">&times;</button>
+                    </div>
+                </div>
+            </div>
+            <div class="row p-3 border-top border-3" style="background: white">
+                <button class="btn btn-dark btn-sm col-md-5 text-nowrap text" style="visibility: hidden" id="addService" onclick="addService()">Thêm dịch vụ</button>
+                <div class="col text-end align-middle col-md text">Trạng thái lịch hẹn: </div>
+            </div>
+        </div>
+        <div class="row pt-4 p-3" style="display: flex" id="btnChangeState">
+            <button class="col btn btn-dark me-5 text" onclick="startUpdateAD({{id}})">Cập nhật lịch hẹn</button>
+            <button class="col btn btn-dark ms-5 text">Tiến hành</button>
+        </div>
+        <div class="row pt-4 p-3" style="display: none" id="btnForUpdate">
+            <button class="col btn btn-dark me-5 text">Xác nhận cập nhật</button>
+            <button class="col btn btn-dark ms-5 text" onclick="cancelUpdateAD({{id}})">Hủy cập nhật</button>
         </div>
     </div>
-    <div class="row pt-4 p-3">
-        <button class="col btn btn-dark me-5 text">Xác nhận lịch hẹn</button>
-        <button class="col btn btn-dark ms-5 text">Hủy lịch hẹn</button>
-    </div>
 </div>
+{%if flag%}
+<script>
+  changeForUpdateAD()
+</script>
+{%endif%}
+{%endif%}
 {%endblock%}
