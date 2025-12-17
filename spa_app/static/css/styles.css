@@ -3,29 +3,6 @@
     font-weight: bold;
 }
 
-#main-body{
-}
-
-.hero-section {
-    background-image: url('your-background.jpg');
-    background-size: cover;
-    background-position: center; height: 100vh; position: relative;
-}
-
-.overlay-content {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 70%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 20% 100%);
-}
-
 .area{
     background: #E2E2E2;
     height:100%
