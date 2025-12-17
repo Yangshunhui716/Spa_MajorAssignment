@@ -1,124 +1,134 @@
 {%extends 'layout/base.html'%}
 
-{%block leftcontent%}
-<div class="position-absolute translate-middle-y fw-bolder title">Danh sách khách hàng</div>
-<div class="pt-4 pb-2">
-    <div class="row pt-1">
-        <div class="col">
-            <input id="search" class="form-control" type="text" placeholder="Search" style="width: 32vw" onchange="search()" value="{{kw}}">
-        </div>
-        <div class="col pt-1">
-            <ul class="pagination justify-content-end col pagination-sm">
-                <li class="page-item"><a class="page-link" href="#"><</a></li>
-                {%for i in range(1, pages+1)%}
-                    <li class="page-item"><a class="page-link" href="/?page={{i}}">{{i}}</a></li>
-                {%endfor%}
-                <li class="page-item"><a class="page-link" href="#">></a></li>
-            </ul>
-        </div>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-bordered text">
-        <thead class="table-dark text-center align-middle">
-            <tr>
-                <th class="table-first-col">Khách hàng</th>
-                <th class="service-sheet-table-col">Thời gian dự kiến thực hiện</th>
-                <th class="service-sheet-table-col">
-                    <div class="dropdown-toggle" data-bs-toggle="dropdown">Trạng thái <br> lịch hẹn</div>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Tất cả trạng thái</a></li>
-                        <li><a class="dropdown-item" href="#">Trạng thái 1</a></li>
-                        <li><a class="dropdown-item" href="#">Trạng thái 2</a></li>
+{%block content%}
+<div id="main-body" class="row g-3 gy-4 m-3 mb-5">
+<div class="col-md">
+    <div class="container position-relative area">
+        <div class="position-absolute translate-middle-y fw-bolder title">Danh sách khách hàng</div>
+        <div class="pt-4 pb-2">
+            <div class="row pt-1">
+                <div class="col">
+                    <input id="search" class="form-control" type="text" placeholder="Search" style="width: 32vw"
+                           onchange="search()" value="{{kw}}">
+                </div>
+                <div class="col pt-1">
+                    <ul class="pagination justify-content-end col pagination-sm">
+                        <li class="page-item"><a class="page-link" href="#"><</a></li>
+                        {%for i in range(1, pages+1)%}
+                        <li class="page-item"><a class="page-link" href="/?page={{i}}">{{i}}</a></li>
+                        {%endfor%}
+                        <li class="page-item"><a class="page-link" href="#">></a></li>
                     </ul>
-                </th>
-            </tr>
-        </thead>
-        <tbody class="table-light">
-            <tr onclick="displaySheetDetail(1)">
-                <td class="table-first-col">John</td>
-                <td class="service-sheet-table-col">Doe</td>
-                <td class="service-sheet-table-col">com</td>
-            </tr>
-        </tbody>
-    </table>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered text">
+                    <thead class="table-dark text-center align-middle">
+                    <tr>
+                        <th class="table-first-col">Khách hàng</th>
+                        <th class="service-sheet-table-col">Thời gian dự kiến thực hiện</th>
+                        <th class="service-sheet-table-col">
+                            <div class="dropdown-toggle" data-bs-toggle="dropdown">Trạng thái <br> lịch hẹn</div>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Tất cả trạng thái</a></li>
+                                <li><a class="dropdown-item" href="#">Trạng thái 1</a></li>
+                                <li><a class="dropdown-item" href="#">Trạng thái 2</a></li>
+                            </ul>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-light">
+                    <tr onclick="displaySheetDetail(1)">
+                        <td class="table-first-col">John</td>
+                        <td class="service-sheet-table-col">Doe</td>
+                        <td class="service-sheet-table-col">com</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
-{%endblock%}
 
-{%block rightcontent%}
-{%if id!=0%}
-<div class="container position-relative area">
-    <div class="position-absolute translate-middle-y fw-bolder title">Phiếu dịch vụ</div>
-    <button type="button" class="btn btn-dark d-flex align-items-center
+<div class="col-md">
+    {%if id!=0%}
+    <div class="container position-relative area">
+        <div class="position-absolute translate-middle-y fw-bolder title">Phiếu dịch vụ</div>
+        <button type="button" class="btn btn-dark d-flex align-items-center
         justify-content-center me-4 position-absolute end-0 translate-middle-y"
-        style="width: 25px; height: 25px" onclick="closeSheetDetail()">&times;</button>
-    <div class="container pt-5 pb-2">
-        <div class="table-responsive" style="max-height: 170px; overflow-y: auto; background: white">
-            <table class="table table-bordered text">
-            <thead class="table-dark text-center align-middle">
-                <tr>
-                    <th></th>
-                    <th class="table-first-col">Dịch vụ</th>
-                    <th class="service-sheet-table-col">Thời lượng dịch vụ</th>
-                    <th class="service-sheet-table-col">Giá dịch vụ</th>
-                </tr>
-            </thead>
-            <tbody class="table-light">
-                <tr>
-                    <td>1</td>
-                    <td class="table-first-col">John</td>
-                    <td class="service-sheet-table-col">Doe</td>
-                    <td class="service-sheet-table-col">com</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td class="table-first-col">John</td>
-                    <td class="service-sheet-table-col">Doe</td>
-                    <td class="service-sheet-table-col">com</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td class="table-first-col">John</td>
-                    <td class="service-sheet-table-col">Doe</td>
-                    <td class="service-sheet-table-col">com</td>
-                </tr>
-            </tbody>
-        </table>
-        </div>
-        <div class="pt-3 pb-2">
-            <div class="subtitle">Khách hàng:</div>
-            <div class="row row-col-2 text">
-                <div class="col-6">Dịch vụ hiện tại:</div>
-                <div class="col-6">Dịch vụ kế tiếp:</div>
-                <div class="col-6">Kỹ thuật viên:</div>
-                <div class="col-6">Kỹ thuật viên:</div>
+                style="width: 25px; height: 25px" onclick="closeSheetDetail()">&times;
+        </button>
+        <div class="container pt-5 pb-2">
+            <div class="table-responsive" style="max-height: 170px; overflow-y: auto; background: white">
+                <table class="table table-bordered text">
+                    <thead class="table-dark text-center align-middle">
+                    <tr>
+                        <th></th>
+                        <th class="table-first-col">Dịch vụ</th>
+                        <th class="service-sheet-table-col">Thời lượng dịch vụ</th>
+                        <th class="service-sheet-table-col">Giá dịch vụ</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-light">
+                    <tr>
+                        <td>1</td>
+                        <td class="table-first-col">John</td>
+                        <td class="service-sheet-table-col">Doe</td>
+                        <td class="service-sheet-table-col">com</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td class="table-first-col">John</td>
+                        <td class="service-sheet-table-col">Doe</td>
+                        <td class="service-sheet-table-col">com</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td class="table-first-col">John</td>
+                        <td class="service-sheet-table-col">Doe</td>
+                        <td class="service-sheet-table-col">com</td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
-        </div>
-        <div class="container position-relative mt-4" style="background: #B2B2B2" id="noteArea">
-            <div class="position-absolute translate-middle-y fw-bolder subtitle">Ghi chú dịch vụ</div>
-            <div class="pt-3 pb-1">
-                <input type="text" class="form-control border-0" id="serviceNote" style="background: #B2B2B2" readonly>
+            <div class="pt-3 pb-2">
+                <div class="subtitle">Khách hàng:</div>
+                <div class="row row-col-2 text">
+                    <div class="col-6">Dịch vụ hiện tại:</div>
+                    <div class="col-6">Dịch vụ kế tiếp:</div>
+                    <div class="col-6">Kỹ thuật viên:</div>
+                    <div class="col-6">Kỹ thuật viên:</div>
+                </div>
             </div>
-        </div>
-        <div class="container position-relative mt-4" style="background: #B2B2B2" id="replyArea">
-            <div class="position-absolute translate-middle-y fw-bolder subtitle">Phản hồi của KH về dịch vụ</div>
-            <div class="pt-3 pb-1">
-                <textarea class="form-control border-0" rows="2" id="customerReply" style="background: #B2B2B2" readonly></textarea>
+            <div class="container position-relative mt-4" style="background: #B2B2B2" id="noteArea">
+                <div class="position-absolute translate-middle-y fw-bolder subtitle">Ghi chú dịch vụ</div>
+                <div class="pt-3 pb-1">
+                    <input type="text" class="form-control border-0" id="serviceNote" style="background: #B2B2B2"
+                           readonly>
+                </div>
             </div>
-        </div>
-        <div class="row pt-4 p-3 " style="display: flex" id="btnUpdate">
-            <button class="col btn btn-dark text" onclick="startUpdateSD({{id}})">Cập nhật</button>
-        </div>
-        <div class="row pt-4 p-3" style="display: none" id="btnForUpdate">
-            <button class="col btn btn-dark me-5 text">Xác nhận cập nhật</button>
-            <button class="col btn btn-dark ms-5 text" onclick="cancelUpdateSD({{id}})">Hủy cập nhật</button>
+            <div class="container position-relative mt-4" style="background: #B2B2B2" id="replyArea">
+                <div class="position-absolute translate-middle-y fw-bolder subtitle">Phản hồi của KH về dịch vụ</div>
+                <div class="pt-3 pb-1">
+                    <textarea class="form-control border-0" rows="2" id="customerReply" style="background: #B2B2B2"
+                              readonly></textarea>
+                </div>
+            </div>
+            <div class="row pt-4 p-3 " style="display: flex" id="btnUpdate">
+                <button class="col btn btn-dark text" onclick="startUpdateSD({{id}})">Cập nhật</button>
+            </div>
+            <div class="row pt-4 p-3" style="display: none" id="btnForUpdate">
+                <button class="col btn btn-dark me-5 text">Xác nhận cập nhật</button>
+                <button class="col btn btn-dark ms-5 text" onclick="cancelUpdateSD({{id}})">Hủy cập nhật</button>
+            </div>
         </div>
     </div>
+    {%if flag%}
+    <script>
+        changeForUpdateSD()
+    </script>
+    {%endif%}
+    {%endif%}
 </div>
-{%if flag%}
-<script>
-  changeForUpdateSD()
-</script>
-{%endif%}
-{%endif%}
+</div>
 {%endblock%}

@@ -1,9 +1,13 @@
 from flask import Flask, render_template, request, session
+from spa_app import db, app
 
-app = Flask(__name__)
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 @app.route('/appointments/<int:id>')
 def appointment(id):
+    appointments = db.session.query()
     kw = request.args.get("search")
     if kw is None:
         return render_template("appointments.html", pages=1, id=id)

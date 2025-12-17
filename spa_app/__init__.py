@@ -16,4 +16,3 @@ cloudinary.config(
 )
 
 db = SQLAlchemy(app)
-login = LoginManager(app)

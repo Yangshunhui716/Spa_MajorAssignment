@@ -19,24 +19,12 @@
 </head>
 <body>
 {%block header%}
-{%include 'layout/header.html'%}
 {%endblock%}
 
-<div id="main-body" class="row g-3 gy-4 m-3 mt-5 mb-5">
-    <div class="col-md">
-        <div class="container position-relative area">
-            {%block leftcontent required%}
-            {%endblock%}
-        </div>
-    </div>
-    <div class="col-md">
-        {%block rightcontent required%}
-        {%endblock%}
-    </div>
-</div>
+{%block content required%}
+{%endblock%}
 
 {%block footer%}
-{%include 'layout/footer.html'%}
 {%endblock%}
 </body>
 </html>
