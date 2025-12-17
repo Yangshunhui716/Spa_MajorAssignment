@@ -1,16 +1,19 @@
-import datetime
-
+from datetime import datetime
 from sqlalchemy import Column, String, Integer, Text, ForeignKey, DateTime, Enum, Double
-from spa_app import db,app
+from sqlalchemy.orm import relationship
+
+from spa_app import db, app
 from enum import Enum as RoleEnum
+
 
 class UserRole(RoleEnum):
     USER = "USER"
     KHACH_HANG = "Khach_Hang"
     LE_TAN = "Le_Tan"
     THU_NGAN = "Thu_Ngan"
-    QUAN_LY = "Quan_LY"
-    QUAN_TRI_VIEN ="Quan_Tri_Vien"
+    QUAN_LY = "Quan_Ly"
+    QUAN_TRI_VIEN = "Quan_Tri_Vien"
+
 
 class TrangThaiKTV(RoleEnum):
     RANH = 'RANH'
@@ -18,116 +21,153 @@ class TrangThaiKTV(RoleEnum):
     DANG_PHUC_VU = "DANG_PHUC_VU"
     NGHI = 'NGHI'
 
+
 class TrangThaiDatLich(RoleEnum):
     DA_HOAN_THANH = "DA_HOAN_THANH"
     DA_HUY = "DA_HUY"
     DA_XAC_NHAN = "DA_XAC_NHAN"
     CHO_XAC_NHAN = "CHO_XAC_NHAN"
-    DANG_THUC_HIEN ="DANG_THUC_HIEN"
+    DANG_THUC_HIEN = "DANG_THUC_HIEN"
+
 
 class CaLamEnum(RoleEnum):
-    NONE ="NONE"
+    NONE = "NONE"
     S = "8:00 - 11:59"
     C = "12:00 - 15:59"
     T = "17:00 - 20:00"
     A = "8:00 - 13:50"
     B = "14:00 - 20:00"
 
+
 class TrangThaiMaGiamGiaEnum(RoleEnum):
     DA_SU_DUNG = "DA_SU_DUNG"
-    CHUA_SU_DUNG="CHUA_SU_DUNG"
+    CHUA_SU_DUNG = "CHUA_SU_DUNG"
     DA_HET_HAN = "DA_HET_HAN"
+
 
 class BaseModel(db.Model):
     __abstract__ = True
-    id = Column(Integer, primary_key=True, autoincrement=True,unique=True)
-    ngayTao=Column(DateTime,nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
+    ngay_tao = Column(DateTime, nullable=False, default=datetime.now)
+
 
 class User(BaseModel):
-    hoTenUser = Column(String(150), nullable=False)
-    sdtUser = Column(Integer,nullable=False,unique=True)
-    emailUser = Column(String(150),nullable=False)
-    taiKhoanUser = Column(String(50),nullable=False)
-    passwordUser = Column(String(50),nullable=False)
-    roleUser = Column(Enum(UserRole),nullable=False,default=UserRole.USER)
+    ho_ten_user = Column(String(150), nullable=False)
+    sdt_user = Column(Integer, nullable=False, unique=True)
+    email_user = Column(String(150), nullable=False)
+    tai_khoan_user = Column(String(50))
+    password_user = Column(String(50))
+    role_user = Column(Enum(UserRole), nullable=False, default=UserRole.USER)
+
+    dat_lich_khach_hang = relationship(
+        "DatLich",
+        foreign_keys="DatLich.ma_khach_hang",
+        backref="khach_hang",
+        lazy=True
+    )
+
+    user_ky_thuat_vien = relationship("KyThuatVien", backref="ky_thuat_vien", lazy=True)
+
+    dat_lich_le_tan = relationship(
+        "DatLich",
+        foreign_keys="DatLich.ma_le_tan",
+        backref="le_tan",
+        lazy=True
+    )
+
 
 class DichVu(BaseModel):
-    tenDichVu = Column(String(150),nullable=False,unique=True)
-    giaDichVu = Column(Double,nullable=False,default=0)
-    thoiGianDichVu = Column(Integer,nullable=False,default=0)
+    ten_dich_vu = Column(String(150), nullable=False, unique=True)
+    gia_dich_vu = Column(Double, nullable=False, default=0)
+    thoi_gian_dich_vu = Column(Integer, nullable=False, default=0)
+    gioi_han_khach = Column(Integer, nullable=False, default=5)
+
+    phieu_dich_vu_detail = relationship("PhieuDichVuDetail", backref="phieu_dich_vu_detail", lazy=True)
+    dat_lich_detail = relationship("DatLichDetail", backref="dat_lich_detail", lazy=True)
+
+class KyThuatVien(db.Model):
+    ma_ktv = Column(Integer, ForeignKey(User.id, ondelete='CASCADE'), primary_key=True, nullable=False)
+    so_luong_khach = Column(Integer, nullable=False, default=0)
+    trang_thai = Column(Enum(TrangThaiKTV), nullable=False, default=TrangThaiKTV.RANH)
+    dich_vu_chuyen_mon = Column(Integer, ForeignKey(DichVu.id), nullable=False)
+
+    dat_lich_detail = relationship("DatLichDetail", backref="ky_thuat_vien", lazy=True)
 
 class DatLich(BaseModel):
-    trangThaiDatLich = Column(Enum(TrangThaiDatLich),nullable=False,default=TrangThaiDatLich.CHO_XAC_NHAN)
-    #khach hang datlich
-    maKhachHang = Column(Integer,ForeignKey(User.id,ondelete='CASCADE'),nullable=False)
-    #le tan xu ly don dat lich
-    maLeTan = Column(Integer,ForeignKey(User.id,ondelete='CASCADE'),nullable=False)
+    trang_thai_dat_lich = Column(Enum(TrangThaiDatLich), nullable=False, default=TrangThaiDatLich.CHO_XAC_NHAN)
+    ma_khach_hang = Column(Integer, ForeignKey(User.id, ondelete='CASCADE'), nullable=False)
+    ma_le_tan = Column(Integer, ForeignKey(User.id, ondelete='CASCADE'))
+    gio_hen = Column(DateTime, nullable=False, default=datetime.now)
+    ghi_chu = Column(Text, default="")
 
 
-class KyThuatVien(User):
-    soLuongKhach = Column(Integer,nullable=False,default=0)
-    gioiHanKhach = Column(Integer,nullable=False,default=5)
-    trangThai = Column(Enum(TrangThaiKTV),nullable=False, default=TrangThaiKTV.RANH)
-    dichVuChuyeMon = Column(Integer,ForeignKey(DichVu.id),nullable=False)
+    phieu_dich_vu = relationship("PhieuDichVu", backref="phieu_dich_vu", lazy=True)
+
+
+
 
 class ThoiGianBieuKTV(db.Model):
-    maKyThuatVien = Column(Integer,ForeignKey(KyThuatVien.id,ondelete='CASCADE'),primary_key=True)
-    T2 = Column(Enum(CaLamEnum),nullable=False, default=CaLamEnum.NONE)
-    T3 = Column(Enum(CaLamEnum),nullable=False, default=CaLamEnum.NONE)
-    T4 = Column(Enum(CaLamEnum),nullable=False, default=CaLamEnum.NONE)
-    T5 = Column(Enum(CaLamEnum),nullable=False, default=CaLamEnum.NONE)
-    T6 = Column(Enum(CaLamEnum),nullable=False, default=CaLamEnum.NONE)
-    T7 = Column(Enum(CaLamEnum),nullable=False, default=CaLamEnum.NONE)
-    CN = Column(Enum(CaLamEnum),nullable=False, default=CaLamEnum.NONE)
+    ma_ky_thuat_vien = Column(Integer, ForeignKey(KyThuatVien.ma_ktv, ondelete='CASCADE'), primary_key=True)
+    t2 = Column(Enum(CaLamEnum), nullable=False, default=CaLamEnum.NONE)
+    t3 = Column(Enum(CaLamEnum), nullable=False, default=CaLamEnum.NONE)
+    t4 = Column(Enum(CaLamEnum), nullable=False, default=CaLamEnum.NONE)
+    t5 = Column(Enum(CaLamEnum), nullable=False, default=CaLamEnum.NONE)
+    t6 = Column(Enum(CaLamEnum), nullable=False, default=CaLamEnum.NONE)
+    t7 = Column(Enum(CaLamEnum), nullable=False, default=CaLamEnum.NONE)
+    cn = Column(Enum(CaLamEnum), nullable=False, default=CaLamEnum.NONE)
+
 
 class ThoiGianKTVBan(db.Model):
-    maKyThuatVien = Column(Integer,ForeignKey(KyThuatVien.id,ondelete='CASCADE'),primary_key=True)
-    thoiGianBatDau = Column(DateTime,nullable=False)
-    thoiGianKetThuc = Column(DateTime,nullable=False)
+    ma_ky_thuat_vien = Column(Integer, ForeignKey(KyThuatVien.ma_ktv, ondelete='CASCADE'), primary_key=True)
+    thoi_gian_bat_dau = Column(DateTime, nullable=False)
+    thoi_gian_ket_thuc = Column(DateTime, nullable=False)
 
 
-class DatLichDetail(BaseModel):
+class DatLichDetail(db.Model):
+    ma_dat_lich = Column(Integer, ForeignKey(DatLich.id, ondelete='CASCADE'), primary_key=True, nullable=False)
+    ma_dich_vu = Column(Integer, ForeignKey(DichVu.id, ondelete='CASCADE'), primary_key=True, nullable=False)
+    ma_ky_thuat_vien = Column(Integer, ForeignKey(KyThuatVien.ma_ktv, ondelete='CASCADE'), nullable=False)
 
-    maDatLich = Column(Integer,ForeignKey(DatLich.id,ondelete='CASCADE'),nullable=False)
-    maDichVu = Column(Integer,ForeignKey(DichVu.id,ondelete='CASCADE'),nullable=False)
-    maKyThuatVien = Column(Integer,ForeignKey(KyThuatVien.id,ondelete='CASCADE'),nullable=False)
 
 class PhieuDichVu(BaseModel):
-    maDatLich = Column(Integer,ForeignKey(DatLich.id,ondelete='CASCADE'),nullable=False)
+    ma_dat_lich = Column(Integer, ForeignKey(DatLich.id, ondelete='CASCADE'), nullable=False)
 
-class PhieuDichVuDetail(BaseModel):
-    maPhieuDichVu = Column(Integer,ForeignKey(PhieuDichVu.id,ondelete='CASCADE'),nullable=False)
-    maDichVu = Column(Integer,ForeignKey(DichVu.id,ondelete='CASCADE'),nullable=False)
-    thoiLuongThucTe = Column(Integer,nullable=False,default=0)
-    ghiChuKtv = Column(Text,default="")
-    phanHoiKhachHang = Column(Text,default="")
+
+class PhieuDichVuDetail(db.Model):
+    ma_phieu_dich_vu = Column(Integer, ForeignKey(PhieuDichVu.id, ondelete='CASCADE'), primary_key=True, nullable=False)
+    ma_dich_vu = Column(Integer, ForeignKey(DichVu.id, ondelete='CASCADE'), primary_key=True, nullable=False)
+    thoi_gian_cap_nhat = Column(Integer, nullable=False, default=0)
+    ghi_chu_ktv = Column(Text, default="")
+    phan_hoi_khach_hang = Column(Text, default="")
 
 
 class VAT(BaseModel):
-    mucVat = Column(Double,nullable=False,default=0.08)
+    muc_vat = Column(Double, nullable=False, default=0.08)
+
 
 class MaGiamGia(BaseModel):
-    tenMaGiamGia = Column(String(150),nullable=False,unique=True)
-    mucGiamGia = Column(Double,nullable=False,default=0)
+    ten_ma_giam_gia = Column(String(150), nullable=False, unique=True)
+    muc_giam_gia = Column(Double, nullable=False, default=0)
+    ngay_bat_dau = Column(DateTime, nullable=False)
+    ngay_het_han = Column(DateTime, nullable=False)
+    ma_dich_vu = Column(Integer, ForeignKey(DichVu.id, ondelete='CASCADE'), nullable=False)
 
-class HoaDon(BaseModel):
-    maPhieuDichVu = Column(Integer,ForeignKey(PhieuDichVu.id,ondelete='CASCADE'),nullable=False)
-    maVat = Column(Integer,ForeignKey(VAT.id),nullable=False)
-    maGiamGia = Column(Integer,ForeignKey(MaGiamGia.id),nullable=False)
-    tongGiaDichVu = Column(Double,nullable=False, default=0)
-    tongThanhToan = Column(Double,nullable=False,default=0)
 
 class KhachHangMaGiamGia(db.Model):
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    maGiamGia = Column(Integer,ForeignKey(MaGiamGia.id,ondelete='CASCADE'),nullable=False)
-    maKhachHang=Column(Integer,ForeignKey(User.id,ondelete='CASCADE'),nullable=False)
-    ngayBatDau= Column(DateTime,nullable=False)
-    ngayHetHan = Column(DateTime,nullable=False,)
-    trangThai= Column(Enum(TrangThaiMaGiamGiaEnum), nullable= False, default=TrangThaiMaGiamGiaEnum.CHUA_SU_DUNG)
+    ma_giam_gia = Column(Integer, ForeignKey(MaGiamGia.id, ondelete='CASCADE'), primary_key=True, nullable=False)
+    ma_khach_hang = Column(Integer, ForeignKey(User.id, ondelete='CASCADE'), primary_key=True, nullable=False)
+    trang_thai = Column(Enum(TrangThaiMaGiamGiaEnum), nullable=False, default=TrangThaiMaGiamGiaEnum.CHUA_SU_DUNG)
 
-if __name__ =="__main__":
+
+class HoaDon(BaseModel):
+    ma_thu_ngan = Column(Integer, ForeignKey(User.id), nullable=False)
+    ma_phieu_dich_vu = Column(Integer, ForeignKey(PhieuDichVu.id, ondelete='CASCADE'), nullable=False)
+    ma_vat = Column(Integer, ForeignKey(VAT.id), nullable=False)
+    ma_giam_gia = Column(Integer, ForeignKey(MaGiamGia.id), nullable=False)
+    tong_gia_dich_vu = Column(Double, nullable=False, default=0)
+    tong_thanh_toan = Column(Double, nullable=False, default=0)
+
+
+if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-
-
-
