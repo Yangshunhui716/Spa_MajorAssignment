@@ -1,11 +1,15 @@
+import os
 from flask import Flask, render_template, request, session
 from spa_app import db, app
 from spa_app.models import DatLich, DatLichDetail
 
 
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    image_folder = os.path.join(app.static_folder,"images")
+    images = os.listdir(image_folder)
+    return render_template('index.html', images=images)
 
 
 @app.route('/appointments/<int:id>')
