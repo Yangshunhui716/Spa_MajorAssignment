@@ -1,6 +1,7 @@
 {%extends 'layout/base.html'%}
 
 {%block content%}
+
 <div id="main-body" class="row g-3 gy-4 m-3 mb-5">
     <div class="col-md">
         <div class="container position-relative area">
@@ -37,16 +38,13 @@
                         </tr>
                         </thead>
                         <tbody class="table-light">
-                        <tr onclick="displayInvoice(1)">
-                            <td class="table-first-col">John</td>
+                        {%for s in service_sheets%}
+                        <tr onclick="displayInvoice({{s.id}})">
+                            <td class="table-first-col">{{s.dat_lich.khach_hang.ho_ten_user}}</td>
                             <td class="servicessheet-table-col">Doe</td>
-                            <td class="servicessheet-table-col">com</td>
+                            <td class="servicessheet-table-col">{{s.dat_lich.trang_thai_dat_lich.name}}</td>
                         </tr>
-                        <tr onclick="displayInvoice(2)">
-                            <td class="table-first-col">Anna</td>
-                            <td class="servicessheet-table-col">Role</td>
-                            <td class="servicessheet-table-col">com</td>
-                        </tr>
+                        {%endfor%}
                         </tbody>
                     </table>
                 </div>
@@ -64,14 +62,17 @@
             </button>
             <div class="container pt-4 pb-2">
                 <div class="pt-2 pb-3">
-                    <div class="subtitle">Khách hàng:</div>
+                    <div class="subtitle">Khách hàng: {{receipt.phieu_dich_vu.dat_lich.khach_hang.ho_ten_user}}</div>
                     <div class="row row-col-2 text">
-                        <div class="col-6">Email:</div>
-                        <div class="col-6">Số điện thoại:</div>
-                        <div class="col-6">Lịch hẹn ngày:</div>
-                        <div class="col-6">lúc:</div>
-                        <div class="col-6">Thời gian lập hóa đơn:</div>
-                        <div class="col-6">Thời gian thanh toán:</div>
+                        <div class="col-6">Email: {{receipt.phieu_dich_vu.dat_lich.khach_hang.email_user}}</div>
+                        <div class="col-6">Số điện thoại: {{receipt.phieu_dich_vu.dat_lich.khach_hang.sdt_user}}</div>
+                        <div class="col-6">Lịch hẹn ngày:
+                            {{receipt.phieu_dich_vu.dat_lich.gio_hen.strftime("%d/%m/%Y")}}
+                        </div>
+                        <div class="col-6">lúc: {{receipt.phieu_dich_vu.dat_lich.gio_hen.strftime("%H:%M")}}
+                        </div>
+                        <div class="col-6">Thời gian lập hóa đơn: {{receipt.ngay_tao.strftime("%H:%m -%d/%m/%Y")}}</div>
+                        <div class="col-6">Thời gian thanh toán:  chưa update</div>
                     </div>
                 </div>
                 <div class="table-responsive" style="max-height: 170px; overflow-y: auto; background: white">
@@ -85,24 +86,14 @@
                         </tr>
                         </thead>
                         <tbody class="table-light">
+
                         <tr>
                             <td>1</td>
-                            <td class="table-first-col">John</td>
+                            <td class="table-first-col"></td>
                             <td class="servicessheet-table-col">Doe</td>
                             <td class="servicessheet-table-col">com</td>
                         </tr>
-                        <tr>
-                            <td>2</td>
-                            <td class="table-first-col">John</td>
-                            <td class="servicessheet-table-col">Doe</td>
-                            <td class="servicessheet-table-col">com</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td class="table-first-col">John</td>
-                            <td class="servicessheet-table-col">Doe</td>
-                            <td class="servicessheet-table-col">com</td>
-                        </tr>
+
                         </tbody>
                     </table>
                 </div>
@@ -110,7 +101,7 @@
                     <div>Tổng tạm tính</div>
                     <div>Tổng giảm giá trên dịch vụ</div>
                     <div>Giảm giá toàn hóa đơn</div>
-                    <div>Thuế VAT</div>
+                    <div>Thuế VAT </div>
                 </div>
                 <div class="pt-3 pb-3 border-top border-bottom border-3 border-secondary fw-bolder subtitle">
                     Tổng cộng:

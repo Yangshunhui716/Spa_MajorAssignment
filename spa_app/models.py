@@ -66,7 +66,7 @@ class User(BaseModel):
         lazy=True
     )
 
-    user_ky_thuat_vien = relationship("KyThuatVien", backref="ky_thuat_vien", lazy=True)
+    user_ky_thuat_vien = relationship("KyThuatVien", backref="user", lazy=True)
 
     dat_lich_le_tan = relationship(
         "DatLich",
@@ -82,8 +82,8 @@ class DichVu(BaseModel):
     thoi_gian_dich_vu = Column(Integer, nullable=False, default=0)
     gioi_han_khach = Column(Integer, nullable=False, default=5)
 
-    phieu_dich_vu_detail = relationship("PhieuDichVuDetail", backref="phieu_dich_vu_detail", lazy=True)
-    dat_lich_detail = relationship("DatLichDetail", backref="dat_lich_detail", lazy=True)
+    phieu_dich_vu_detail = relationship("PhieuDichVuDetail", backref="dich_vu", lazy=True)
+    dat_lich_detail = relationship("DatLichDetail", backref="dich_vu", lazy=True)
 
 class KyThuatVien(db.Model):
     ma_ktv = Column(Integer, ForeignKey(User.id, ondelete='CASCADE'), primary_key=True, nullable=False)
@@ -101,7 +101,7 @@ class DatLich(BaseModel):
     ghi_chu = Column(Text, default="")
 
 
-    phieu_dich_vu = relationship("PhieuDichVu", backref="phieu_dich_vu", lazy=True)
+    phieu_dich_vu = relationship("PhieuDichVu", backref="dat_lich", lazy=True)
 
 
 
@@ -132,6 +132,9 @@ class DatLichDetail(db.Model):
 class PhieuDichVu(BaseModel):
     ma_dat_lich = Column(Integer, ForeignKey(DatLich.id, ondelete='CASCADE'), nullable=False)
 
+    phieu_dich_vu_details = relationship("PhieuDichVuDetail", backref="phieu_dich_vu", lazy=True)
+
+
 
 class PhieuDichVuDetail(db.Model):
     ma_phieu_dich_vu = Column(Integer, ForeignKey(PhieuDichVu.id, ondelete='CASCADE'), primary_key=True, nullable=False)
@@ -139,6 +142,8 @@ class PhieuDichVuDetail(db.Model):
     thoi_gian_cap_nhat = Column(Integer, nullable=False, default=0)
     ghi_chu_ktv = Column(Text, default="")
     phan_hoi_khach_hang = Column(Text, default="")
+
+
 
 
 class VAT(BaseModel):
@@ -167,6 +172,7 @@ class HoaDon(BaseModel):
     tong_gia_dich_vu = Column(Double, nullable=False, default=0)
     tong_thanh_toan = Column(Double, nullable=False, default=0)
 
+    phieu_dich_vu = relationship("PhieuDichVu", backref="hoa_don", lazy=True)
 
 if __name__ == "__main__":
     with app.app_context():

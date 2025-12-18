@@ -289,9 +289,9 @@ def seed_data_ro_rang():
 
     db.session.add_all([
         don_dat_lich_nguyen_van_a,
-        don_dat_lich_tran_thi_b,
+        don_dat_lich_nguyen_van_hoang,
         don_dat_lich_nguyen_van_tien,
-        don_dat_lich_nguyen_van_hoang
+        don_dat_lich_tran_thi_b
     ])
     db.session.commit()
 
@@ -381,9 +381,10 @@ def seed_data_ro_rang():
     ])
     db.session.commit()
 
-    phieu_dich_vu_ct_massage_nguyen_van_a = PhieuDichVuDetail(
+
+    phieu_dich_vu_ct_cham_soc_da_nguyen_van_a = PhieuDichVuDetail(
         ma_phieu_dich_vu=phieu_dich_vu_nguyen_van_a.id,
-        ma_dich_vu=dich_vu_massage_body.id,
+        ma_dich_vu=dich_vu_cham_soc_da.id,
         ghi_chu_ktv="Khách thư giãn tốt"
     )
 
@@ -398,17 +399,16 @@ def seed_data_ro_rang():
         ma_dich_vu=dich_vu_massage_body.id,
         ghi_chu_ktv="Khách thư giãn tốt"
     )
+    phieu_dich_vu_ct_cham_soc_da_nguyen_van_hoang = PhieuDichVuDetail(
+        ma_phieu_dich_vu=phieu_dich_vu_nguyen_van_hoang.id,
+        ma_dich_vu=dich_vu_cham_soc_da.id,
+        ghi_chu_ktv="Khách thư giãn tốt"
+    )
 
     phieu_dich_vu_ct_goi_dau_nguyen_van_hoang = PhieuDichVuDetail(
         ma_phieu_dich_vu=phieu_dich_vu_nguyen_van_hoang.id,
         ma_dich_vu=dich_vu_goi_dau.id,
         ghi_chu_ktv="Khách hài lòng"
-    )
-
-    phieu_dich_vu_ct_massage_nguyen_van_hoang = PhieuDichVuDetail(
-        ma_phieu_dich_vu=phieu_dich_vu_nguyen_van_hoang.id,
-        ma_dich_vu=dich_vu_massage_body.id,
-        ghi_chu_ktv="Khách thư giãn tốt"
     )
 
     phieu_dich_vu_ct_cham_soc_da_nguyen_van_tien = PhieuDichVuDetail(
@@ -430,13 +430,14 @@ def seed_data_ro_rang():
     )
 
     db.session.add_all([
-        phieu_dich_vu_ct_massage_nguyen_van_a,
+       phieu_dich_vu_ct_cham_soc_da_nguyen_van_a,
         phieu_dich_vu_ct_goi_dau_nguyen_van_a,
-        phieu_dich_vu_ct_massage_nguyen_van_tien,
-        phieu_dich_vu_ct_cham_soc_da_nguyen_van_tien,
+        phieu_dich_vu_ct_cham_soc_da_nguyen_van_hoang,
         phieu_dich_vu_ct_goi_dau_nguyen_van_hoang,
         phieu_dich_vu_ct_massage_nguyen_van_hoang,
-        phieu_dich_vu_ct_massage_tran_thi_b
+        phieu_dich_vu_ct_massage_nguyen_van_tien,
+        phieu_dich_vu_ct_cham_soc_da_nguyen_van_tien,
+        phieu_dich_vu_ct_massage_tran_thi_b,
     ])
     db.session.commit()
 
@@ -539,7 +540,7 @@ def seed_data_ro_rang():
 
     hoa_don_tran_thi_b = HoaDon(
         ma_thu_ngan=thu_ngan_pham_van_d.id,
-        ma_phieu_dich_vu=phieu_dich_vu_nguyen_van_tien.id,
+        ma_phieu_dich_vu=phieu_dich_vu_tran_thi_b.id,
         ma_vat=vat_hien_hanh.id,
         ma_giam_gia=ma_giam_gia_spa_massage.id,
         tong_gia_dich_vu=500000,
