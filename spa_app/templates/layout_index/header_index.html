@@ -1,0 +1,26 @@
+<header class="mb-auto" style="height: 8vh">
+    <div>
+        <nav class="nav-masthead d-flex align-items-center text-white p-2">
+            <!-- Logo bên trái -->
+            <h3 class="mb-0">Logo</h3>
+
+            <!-- Menu nav ở giữa -->
+            <div class="nav justify-content-center flex-grow-1">
+                <a class="nav-link text-white {% if request.endpoint == 'index' %}active{% endif %}"
+                   href="{{ url_for('index') }}">TRANG CHỦ</a>
+                <a class="nav-link text-white {% if request.endpoint == 'index_services' %}active{% endif %}"
+                   href="{{ url_for('index_services') }}">DỊCH VỤ</a>
+                <a class="nav-link text-white {% if request.endpoint == 'contact' %}active{% endif %}"
+                   href="#footer-main">LIÊN HỆ</a>
+            </div>
+
+
+            <!-- Sign In bên phải -->
+            <div>
+                <a class="nav-link text-white" href="#">SIGN IN</a>
+            </div>
+        </nav>
+
+
+    </div>
+</header>

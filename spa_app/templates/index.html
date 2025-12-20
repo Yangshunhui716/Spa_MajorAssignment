@@ -1,25 +1,138 @@
-{%extends 'layout/base.html'%}
+<link href="{{url_for('static', filename='css/styles_index.css')}}" rel="stylesheet">
+
+{%extends 'layout_index/base_index.html'%}
+{% block head %}
+<style>
+  /* CSS chỉ áp dụng cho trang index */
+  html, body {
+    height: 260%;
+    margin: 0;
+    scroll-behavior: smooth;       /* cuộn mượt */
+    scroll-snap-type: y mandatory; /* bắt dính theo trục dọc */
+    overflow-y: scroll;
+    background-color: #fff;
+  }
+</style>
+{% endblock %}
 
 {%block content%}
-<div id="demo" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-indicators">
-        <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
-        <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
-        <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
-    </div>
-    <div class="carousel-inner">
-        {%for img in images%}
-        <div class="carousel-item {%if loop.index == 1%}active{%endif%}">
-            <img src="{{url_for('static', filename='images/' ~ img)}}"
-                 alt="Ảnh {{ loop.index }}" class="d-block w-100">
+
+
+
+
+<!-- Phần 1: Hero -->
+<section id="dat_lich" class="hero-section">
+    <video autoplay muted loop class="video-bg">
+        <source src="{{ url_for('static', filename='video/bg_spa.mp4') }}" type="video/mp4">
+    </video>
+
+    <div class="overlay"></div>
+
+    <main class="content">
+        <h1>SPA NO 1 VIETNAM</h1>
+        <p>Tận hưởng dịch vụ, phê quên lối về</p>
+        <a href="#" class="btn btn-lg btn-light fw-bold" id="open-booking">Đặt Lịch Ngay</a>
+    </main>
+</section>
+
+<!-- Phần 2: Dịch vụ -->
+<section id="dichvuspa" class=" mt-5 text-center">
+    <div class="container">
+        <h2 class="mb-5 ">Dịch Vụ Spa</h2>
+        <div class="row d-flex">
+            <div class="col-md d-flex flex-column">
+                <h5>Massage thư giãn toàn thân</h5>
+            </div>
+            <div class="col-md d-flex flex-column">
+                <h5>Massage đá nóng</h5>
+            </div>
+            <div class="col-md d-flex flex-column">
+                <h5>Chăm sóc da mặt chuyên sâu</h5>
+            </div>
+            <div class="col-md d-flex flex-column">
+                <h5>Tẩy tế bào chết & ủ dưỡng toàn thân</h5>
+            </div>
+            <div class="col-md d-flex flex-column">
+                <h5>Xông hơi thảo dược</h5>
+            </div>
+            <p class="mb-5 mt-5 text-muted" style="font-size: 1.2rem;">
+                Các gói dịch vụ spa tại đây được kết hợp từ 2 đến 3 liệu trình thư giãn, chăm sóc da và cơ thể, giúp bạn
+                tận hưởng trọn vẹn trải nghiệm làm đẹp. Tất cả các gói đều được tặng kèm xông hơi thảo dược miễn phí.
+            </p>
         </div>
-        {%endfor%}
+        <a href="#special" class="btn btn custom-btn btn-outline-primary">Xem chi tiết</a>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
-        <span class="carousel-control-next-icon"></span>
-    </button>
-</div>
+</section>
+
+
+<!-- Phần 2: Dịch vụ -->
+<section id="dichvulamdep" class="text-center mt-0">
+    <div class="container">
+        <h2 class="mb-4">Dịch Vụ Làm Đẹp</h2>
+        <div class="row d-flex">
+            <div class="col-md d-flex flex-column">
+                <h5>Điều trị mụn – thâm – nám</h5>
+            </div>
+            <div class="col-md d-flex flex-column">
+                <h5>Triệt lông công nghệ cao</h5>
+            </div>
+            <div class="col-md d-flex flex-column">
+                <h5>Chăm sóc da mặt chuyên sâu</h5>
+            </div>
+            <div class="col-md d-flex flex-column">
+                <h5>Phun xăm thẩm mỹ</h5>
+            </div>
+            <div class="col-md d-flex flex-column">
+                <h5>Nối mi</h5>
+            </div>
+            <p class="mb-5 mt-5 text-muted" style="font-size: 1.2rem;">
+                Các gói dịch vụ spa tại đây được kết hợp từ 2 đến 3 liệu trình thư giãn, chăm sóc da và cơ thể, giúp bạn
+                tận hưởng trọn vẹn trải nghiệm làm đẹp. Tất cả các gói đều được tặng kèm xông hơi thảo dược miễn phí.
+            </p>
+        </div>
+        <a href="#special" class="btn btn custom-btn btn-outline-primary">Xem chi tiết</a>
+    </div>
+</section>
+
+<!-- Phần 3: Hình ảnh Spa -->
+<section id="image_spa" class="text-center mt-0 ">
+    <div class="container">
+        <h2 class="mb-4">Hình Ảnh Spa</h2>
+        <div class="row">
+            <div class="col"><img src="static/images/spa1.jpg" class="img-fluid rounded" alt="Spa 1"></div>
+            <div class="col"><img src="static/images/spa2.jpg" class="img-fluid rounded" alt="Spa 2"></div>
+            <div class="col"><img src="static/images/spa3.jpg" class="img-fluid rounded" alt="Spa 3"></div>
+            <div class="col"><img src="static/images/spa4.jpg" class="img-fluid rounded" alt="Spa 4"></div>
+            <div class="col"><img src="static/images/spa5.jpg" class="img-fluid rounded" alt="Spa 5"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Phần 4: Lời chia sẻ khách hàng -->
+<section id="customer_fb" class="text-center mt-0 mb-3">
+    <div class="container">
+        <h2 class="mb-4">Khách Hàng Nói Gì?</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <blockquote class="blockquote">
+                    <p>"Dịch vụ tuyệt vời, tôi cảm thấy rất thư giãn!"</p>
+                    <footer class="blockquote-footer">Chị Lan</footer>
+                </blockquote>
+            </div>
+            <div class="col-md-4">
+                <blockquote class="blockquote">
+                    <p>"Không gian spa sang trọng và nhân viên thân thiện."</p>
+                    <footer class="blockquote-footer">Anh Minh</footer>
+                </blockquote>
+            </div>
+            <div class="col-md-4">
+                <blockquote class="blockquote">
+                    <p>"Tôi sẽ quay lại thường xuyên, rất hài lòng."</p>
+                    <footer class="blockquote-footer">Chị Hương</footer>
+                </blockquote>
+            </div>
+        </div>
+    </div>
+</section>
+
 {%endblock%}

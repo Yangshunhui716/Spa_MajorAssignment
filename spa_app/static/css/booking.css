@@ -1,0 +1,96 @@
+body {
+background-color: #FAF3E0;
+}
+
+h2 {
+font-family: 'Lobster', cursive;
+font-size: 2.2rem;
+color: #000;
+}
+.booking-form {
+max-width: 1000px;
+margin: 40px auto;
+background-color: #fff;
+padding: 30px;
+border-radius: 12px;
+box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.form-block {
+background-color: #e0e0e0;
+/* xám đậm hơn */
+padding: 15px;
+border-radius: 8px;
+margin-bottom: 15px;
+}
+
+.form-block label {
+font-weight: bold;
+color: #000;
+}
+
+.service-block {
+background-color: #e0e0e0;
+/* xám đậm hơn */
+padding: 15px;
+border-radius: 8px;
+height: 100%;
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+}
+
+#service-list {
+max-height: 400px;
+/* giới hạn chiều cao */
+overflow-y: auto;
+/* thêm scroll khi quá nhiều dịch vụ */
+padding-right: 5px;
+}
+
+.add-service {
+background-color: #F7E7CE;
+border: none;
+padding: 8px 12px;
+border-radius: 6px;
+font-weight: bold;
+}
+
+.remove-btn {
+width: 28px;
+height: 28px;
+border-radius: 50%;
+background-color: #000000;
+color: #ffffff;
+font-size: 20px;
+font-weight: bold;
+line-height: 1;
+display: flex;
+align-items: center;
+justify-content: center;
+margin-left: 10px;
+cursor: not-allowed;
+}
+
+.remove-btn.active {
+cursor: pointer;
+}
+
+.remove-btn.active:hover {
+background-color: #dc3545;
+color: #fff;
+}
+
+.service-footer {
+border-top: 1px solid #ccc;
+margin-top: 15px;
+padding-top: 15px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.service-footer span {
+font-weight: bold;
+color: #000;
+}
