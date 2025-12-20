@@ -272,7 +272,7 @@ def seed_data_ro_rang():
     don_dat_lich_nguyen_van_tien = DatLich(
         ma_khach_hang=khach_hang_nguyen_van_tien.id,
         ma_le_tan=le_tan_le_thi_c.id,
-        trang_thai_dat_lich=TrangThaiDatLich.DA_HUY,
+        trang_thai_dat_lich=TrangThaiDatLich.CHO_XAC_NHAN,
         gio_hen=datetime.now() + timedelta(days=1),
         ghi_chu="Tôi không có ghi chú"
 
@@ -284,7 +284,6 @@ def seed_data_ro_rang():
         trang_thai_dat_lich=TrangThaiDatLich.DA_HUY,
         gio_hen=datetime.now() + timedelta(days=2),
         ghi_chu="no"
-
     )
 
     db.session.add_all([
@@ -329,13 +328,13 @@ def seed_data_ro_rang():
     chi_tiet_dat_lich_massage_nguyen_van_tien = DatLichDetail(
         ma_dat_lich=don_dat_lich_nguyen_van_tien.id,
         ma_dich_vu=dich_vu_massage_body.id,
-        ma_ky_thuat_vien=ky_thuat_vien_massage_1.ma_ktv
+        ma_ky_thuat_vien=None
     )
 
     chi_tiet_dat_lich_goi_dau_nguyen_van_tien = DatLichDetail(
         ma_dat_lich=don_dat_lich_nguyen_van_tien.id,
         ma_dich_vu=dich_vu_goi_dau.id,
-        ma_ky_thuat_vien=ky_thuat_vien_goi_dau_1.ma_ktv
+        ma_ky_thuat_vien=None
     )
 
     chi_tiet_dat_lich_massage_tran_thi_b = DatLichDetail(
@@ -384,7 +383,7 @@ def seed_data_ro_rang():
 
     phieu_dich_vu_ct_cham_soc_da_nguyen_van_a = PhieuDichVuDetail(
         ma_phieu_dich_vu=phieu_dich_vu_nguyen_van_a.id,
-        ma_dich_vu=dich_vu_cham_soc_da.id,
+        ma_dich_vu=dich_vu_massage_body.id,
         ghi_chu_ktv="Khách thư giãn tốt"
     )
 

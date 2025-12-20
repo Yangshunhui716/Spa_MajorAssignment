@@ -75,12 +75,13 @@ class User(BaseModel):
         lazy=True
     )
 
-
 class DichVu(BaseModel):
     ten_dich_vu = Column(String(150), nullable=False, unique=True)
+    mo_ta = Column(String(150))
     gia_dich_vu = Column(Double, nullable=False, default=0)
     thoi_gian_dich_vu = Column(Integer, nullable=False, default=0)
     gioi_han_khach = Column(Integer, nullable=False, default=5)
+
 
     phieu_dich_vu_detail = relationship("PhieuDichVuDetail", backref="dich_vu", lazy=True)
     dat_lich_detail = relationship("DatLichDetail", backref="dich_vu", lazy=True)
@@ -102,8 +103,7 @@ class DatLich(BaseModel):
 
 
     phieu_dich_vu = relationship("PhieuDichVu", backref="dat_lich", lazy=True)
-
-
+    dat_lich_detail = relationship("DatLichDetail", backref="dat_lich", lazy=True)
 
 
 class ThoiGianBieuKTV(db.Model):
@@ -126,7 +126,7 @@ class ThoiGianKTVBan(db.Model):
 class DatLichDetail(db.Model):
     ma_dat_lich = Column(Integer, ForeignKey(DatLich.id, ondelete='CASCADE'), primary_key=True, nullable=False)
     ma_dich_vu = Column(Integer, ForeignKey(DichVu.id, ondelete='CASCADE'), primary_key=True, nullable=False)
-    ma_ky_thuat_vien = Column(Integer, ForeignKey(KyThuatVien.ma_ktv, ondelete='CASCADE'), nullable=False)
+    ma_ky_thuat_vien = Column(Integer, ForeignKey(KyThuatVien.ma_ktv, ondelete='CASCADE'))
 
 
 class PhieuDichVu(BaseModel):
@@ -139,7 +139,7 @@ class PhieuDichVu(BaseModel):
 class PhieuDichVuDetail(db.Model):
     ma_phieu_dich_vu = Column(Integer, ForeignKey(PhieuDichVu.id, ondelete='CASCADE'), primary_key=True, nullable=False)
     ma_dich_vu = Column(Integer, ForeignKey(DichVu.id, ondelete='CASCADE'), primary_key=True, nullable=False)
-    thoi_gian_cap_nhat = Column(Integer, nullable=False, default=0)
+    thoi_gian_cap_nhat = Column(DateTime)
     ghi_chu_ktv = Column(Text, default="")
     phan_hoi_khach_hang = Column(Text, default="")
 

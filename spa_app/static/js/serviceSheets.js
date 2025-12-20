@@ -1,17 +1,17 @@
-function displaySheetDetail(serviceSheetId){
-    window.location.href = "/serviceSheets/" + serviceSheetId + window.location.search;
+function displaySheetDetail(appointmentId){
+    window.location.href = "/serviceSheets/" + appointmentId + window.location.search;
 }
 
 function closeSheetDetail(){
     window.location.href = "/serviceSheets/0" + window.location.search;
 }
 
-function startUpdateSD(serviceSheetId){
-    window.location.href = "/serviceSheets/update/" + serviceSheetId + window.location.search;
+function startUpdateSD(appointmentId){
+    window.location.href = "/serviceSheets/update/" + appointmentId + window.location.search;
 }
 
-function cancelUpdateSD(serviceSheetId){
-    window.location.href = "/serviceSheets/" + serviceSheetId;
+function cancelUpdateSD(appointmentId){
+    window.location.href = "/serviceSheets/" + appointmentId + window.location.search;
 }
 
 function changeForUpdateSD(){
@@ -25,3 +25,25 @@ function changeForUpdateSD(){
     document.getElementById("customerReply").readOnly = false;
 }
 
+function successUpdateSD(serviceId, appointmentId) {
+    let updateContent = {
+        ma_dich_vu: serviceId,
+        ghi_chu: document.getElementById("serviceNote").value,
+        phan_hoi: document.getElementById("customerReply").value
+    };
+
+    fetch(`/serviceSheets/update/${appointmentId}/success`,{
+        method: "post",
+        body: JSON.stringify(updateContent),
+        headers: {
+            "content-type": "application/json"
+        }
+    }).then(res => res.json()).then(data => {
+        if (data.status==200) {
+            window.location.href = "/serviceSheets/" + appointmentId;
+        }
+        else{
+            alert(data.err_msg)
+        }
+    });
+}

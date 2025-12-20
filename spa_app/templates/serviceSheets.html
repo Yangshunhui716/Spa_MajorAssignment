@@ -9,7 +9,7 @@
                 <div class="row pt-1">
                     <div class="col">
                         <input id="search" class="form-control" type="text" placeholder="Search" style="width: 32vw"
-                               onchange="search()" value="{{kw}}">
+                               onchange="search()" value="{%if kw!=None%}{{kw}}{%endif%}">
                     </div>
                     <div class="col pt-1">
                         <ul class="pagination justify-content-end col pagination-sm">
@@ -53,7 +53,7 @@
     </div>
 
     <div class="col-md">
-        {%if id!=0%}
+        {%if id > 0%}
         <div class="container position-relative area">
             <div class="position-absolute translate-middle-y fw-bolder title">Phiếu dịch vụ</div>
             <button type="button" class="btn btn-dark d-flex align-items-center
@@ -72,34 +72,33 @@
                         </tr>
                         </thead>
                         <tbody class="table-light">
-                        {%for pdv in service_sheet_detail%}
-
+                        {%for ad in appointment_details%}
                         <tr>
                             <td>{{loop.index}}</td>
-                            <td class="table-first-col">{{pdv.dich_vu.ten_dich_vu}}</td>
-                            <td class="service-sheet-table-col">{{pdv.dich_vu.thoi_gian_dich_vu}}</td>
-                            <td class="service-sheet-table-col">{{pdv.dich_vu.gia_dich_vu}}</td>
+                            <td class="table-first-col">{{ad.dich_vu.ten_dich_vu}}</td>
+                            <td class="service-sheet-table-col">{{ad.dich_vu.thoi_gian_dich_vu}}</td>
+                            <td class="service-sheet-table-col">{{ad.dich_vu.gia_dich_vu}}</td>
                         </tr>
                         {%endfor%}
                         </tbody>
                     </table>
                 </div>
                 <div class="pt-3 pb-2">
-                    <div class="subtitle">Khách hàng: {{service_sheet.dat_lich.khach_hang.ho_ten_user}}</div>
+                    <div class="subtitle">Khách hàng: {{appointment_details[0].dat_lich.khach_hang.ho_ten_user}}</div>
                     <div class="row row-col-2 text">
                         <div class="col-6">Dịch vụ hiện tại:
-                            {{service_sheet.phieu_dich_vu_details[0].dich_vu.ten_dich_vu}}
+                            {{appointment_details[0].dich_vu.ten_dich_vu}}
                         </div>
-                        <div class="col-6">Kỹ thuật viên: {{appointment_detail[0].ky_thuat_vien.user.ho_ten_user}}</div>
+                        <div class="col-6">Kỹ thuật viên: {{appointment_details[0].ky_thuat_vien.user.ho_ten_user}}</div>
                     </div>
 
                     <div class="row row-col-2 text">
 
-                        {%if service_sheet_detail[0 + 1] != null %}
+                        {%if appointment_details[0 + 1] != null%}
                         <div class="col-6">Dịch vụ kế tiếp:
-                            {{service_sheet.phieu_dich_vu_details[1].dich_vu.ten_dich_vu}}
+                            {{appointment_details[1].dich_vu.ten_dich_vu}}
                         </div>
-                        <div class="col-6">Kỹ thuật viên: {{appointment_detail[1].ky_thuat_vien.user.ho_ten_user}}</div>
+                        <div class="col-6">Kỹ thuật viên: {{appointment_details[1].ky_thuat_vien.user.ho_ten_user}}</div>
                         {%endif%}
                     </div>
 
@@ -108,7 +107,7 @@
                     <div class="position-absolute translate-middle-y fw-bolder subtitle">Ghi chú dịch vụ</div>
                     <div class="pt-3 pb-1">
                         <input type="text" class="form-control border-0" id="serviceNote" style="background: #B2B2B2"
-                               readonly value="{{service_sheet.phieu_dich_vu_details[0].ghi_chu_ktv}}">
+                               readonly value="{{service_sheet_details[0].ghi_chu_ktv}}">
 
                     </div>
                 </div>
@@ -116,18 +115,19 @@
                     <div class="position-absolute translate-middle-y fw-bolder subtitle">Phản hồi của KH về dịch vụ
                     </div>
                     <div class="pt-3 pb-1">
-                    <textarea class="form-control border-0" rows="2" id="customerReply" style="background: #B2B2B2"
-                              readonly> {{service_sheet.phieu_dich_vu_details[0].phan_hoi_khach_hang}}</textarea>
+                    <textarea class="form-control border-0" id="customerReply" style="background: #B2B2B2" readonly>{{service_sheet_details[0].phan_hoi_khach_hang}}</textarea>
                     </div>
                 </div>
                 <div class="row pt-4 p-3 " style="display: flex" id="btnUpdate">
-                    <button class="col btn btn-dark text" onclick="startUpdateSD({{service_sheet.id}})">Cập nhật
+                    <button class="col btn btn-dark text" onclick="startUpdateSD({{id}})">
+                        Cập nhật
                     </button>
                 </div>
                 <div class="row pt-4 p-3" style="display: none" id="btnForUpdate">
-                    <button class="col btn btn-dark me-5 text">Xác nhận cập nhật</button>
-                    <button class="col btn btn-dark ms-5 text" onclick="cancelUpdateSD({{service_sheet.id}})">Hủy cập
-                        nhật
+                    <button class="col btn btn-dark me-5 text" onclick="successUpdateSD({{appointment_details[0].dich_vu.id}}
+                    , {{appointment_details[0].dat_lich.id}})">Xác nhận cập nhật</button>
+                    <button class="col btn btn-dark ms-5 text" onclick="cancelUpdateSD({{id}})">
+                        Hủy cập nhật
                     </button>
                 </div>
             </div>

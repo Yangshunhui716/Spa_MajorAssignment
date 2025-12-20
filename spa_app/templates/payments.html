@@ -1,7 +1,6 @@
 {%extends 'layout/base.html'%}
 
 {%block content%}
-
 <div id="main-body" class="row g-3 gy-4 m-3 mb-5">
     <div class="col-md">
         <div class="container position-relative area">
@@ -10,7 +9,7 @@
                 <div class="row pt-1">
                     <div class="col">
                         <input id="search" class="form-control" type="text" placeholder="Search" style="width: 32vw"
-                               onchange="search()" value="{{kw}}">
+                               onchange="search()" value="{%if kw!=None%}{{kw}}{%endif%}">
                     </div>
                     <div class="col pt-1">
                         <ul class="pagination justify-content-end col pagination-sm">
@@ -53,7 +52,7 @@
     </div>
 
     <div class="col-md">
-        {%if id!=0%}
+        {%if id>0%}
         <div class="container position-relative area">
             <div class="position-absolute translate-middle-y fw-bolder title">Hóa đơn</div>
             <button type="button" class="btn btn-dark d-flex align-items-center
@@ -62,17 +61,24 @@
             </button>
             <div class="container pt-4 pb-2">
                 <div class="pt-2 pb-3">
-                    <div class="subtitle">Khách hàng: {{receipt.phieu_dich_vu.dat_lich.khach_hang.ho_ten_user}}</div>
+                    <div class="subtitle">Khách hàng: {{service_sheet_detail[0].phieu_dich_vu.dat_lich.khach_hang.ho_ten_user}}</div>
                     <div class="row row-col-2 text">
-                        <div class="col-6">Email: {{receipt.phieu_dich_vu.dat_lich.khach_hang.email_user}}</div>
-                        <div class="col-6">Số điện thoại: {{receipt.phieu_dich_vu.dat_lich.khach_hang.sdt_user}}</div>
+                        <div class="col-6">Email: {{service_sheet_detail[0].phieu_dich_vu.dat_lich.khach_hang.email_user}}</div>
+                        <div class="col-6">Số điện thoại: {{service_sheet_detail[0].phieu_dich_vu.dat_lich.khach_hang.sdt_user}}</div>
                         <div class="col-6">Lịch hẹn ngày:
-                            {{receipt.phieu_dich_vu.dat_lich.gio_hen.strftime("%d/%m/%Y")}}
+                            {{service_sheet_detail[0].phieu_dich_vu.dat_lich.gio_hen.strftime("%d/%m/%Y")}}
                         </div>
-                        <div class="col-6">lúc: {{receipt.phieu_dich_vu.dat_lich.gio_hen.strftime("%H:%M")}}
+                        <div class="col-6">lúc: {{service_sheet_detail[0].phieu_dich_vu.dat_lich.gio_hen.strftime("%H:%M")}}</div>
+                        <div class="col-6">Thời gian lập hóa đơn:
+                            {%if receiption!=None%}
+                            {{receiption.ngay_tao.strftime("%H:%m -%d/%m/%Y")}}
+                            {%endif%}
                         </div>
-                        <div class="col-6">Thời gian lập hóa đơn: {{receipt.ngay_tao.strftime("%H:%m -%d/%m/%Y")}}</div>
-                        <div class="col-6">Thời gian thanh toán:  chưa update</div>
+                        <div class="col-6">Thời gian thanh toán:
+                            {%if receiption!=None%}
+                            Chưa có thuộc tính
+                            {%endif%}
+                        </div>
                     </div>
                 </div>
                 <div class="table-responsive" style="max-height: 170px; overflow-y: auto; background: white">
@@ -86,14 +92,14 @@
                         </tr>
                         </thead>
                         <tbody class="table-light">
-
+                        {%for sd in service_sheet_detail%}
                         <tr>
-                            <td>1</td>
-                            <td class="table-first-col"></td>
-                            <td class="servicessheet-table-col">Doe</td>
-                            <td class="servicessheet-table-col">com</td>
+                            <td>{{loop.index}}</td>
+                            <td class="table-first-col">{{sd.dich_vu.ten_dich_vu}}</td>
+                            <td class="servicessheet-table-col">{{sd.dich_vu.gia_dich_vu}}</td>
+                            <td class="servicessheet-table-col">None</td>
                         </tr>
-
+                        {%endfor%}
                         </tbody>
                     </table>
                 </div>

@@ -9,7 +9,7 @@
                 <div class="row pt-1">
                     <div class="col">
                         <input id="search" class="form-control" type="text" placeholder="Search" style="width: 32vw"
-                               onchange="search()" value="{{kw}}">
+                               onchange="search()" value="{%if kw!=None%}{{kw}}{%endif%}">
                     </div>
                     <div class="col pt-1">
                         <ul class="pagination justify-content-end col pagination-sm">
@@ -41,8 +41,7 @@
                         </tr>
                         </thead>
                         <tbody class="table-light">
-                        {%for a in appointments %}
-
+                        {%for a in appointments%}
                         <tr onclick="displayAppointmentDetail({{a.id}})">
                             <td class="table-first-col">{{a.khach_hang.ho_ten_user}}</td>
                             <td class="appointment-table-col">{{a.gio_hen.strftime("%d/%m/%Y")}}</td>
@@ -56,37 +55,36 @@
             </div>
         </div>
     </div>
+
     <div class="col-md">
-        {%if id != 0 %}
+        {%if id > 0%}
         <div id="appointment-detail" class="container position-relative area">
             <div class="position-absolute translate-middle-y fw-bolder title">Chi tiết lịch hẹn</div>
             <button type="button" class="btn btn-dark d-flex align-items-center
         justify-content-center me-4 position-absolute end-0 translate-middle-y"
                     style="width: 25px; height: 25px" onclick="closeAppointmentDetail()">&times;
             </button>
-
-
             <div class="container pt-4 pb-2">
-                <div class="pt-2 pb-2">
-                    <div class="subtitle">Khách hàng: {{ appointment_chossen.khach_hang.ho_ten_user}}</div>
-                    <div class="row text">
-                        <div class="col">Email: {{appointment_chossen.khach_hang.email_user}}</div>
-                        <div class="col">Số điện thoại: {{appointment_chossen.khach_hang.sdt_user}}</div>
+                <div class="mt-2">
+                    <div class="subtitle">Khách hàng: {{appointment_details[0].dat_lich.khach_hang.ho_ten_user}}</div>
+                    <div class="row text pt-1 gy-1">
+                        <div class="col">Email: {{appointment_details[0].dat_lich.khach_hang.email_user}}</div>
+                        <div class="col">Số điện thoại: {{appointment_details[0].dat_lich.khach_hang.sdt_user}}</div>
                     </div>
-                    <div class="row text">
-                        <div class="col">Ngày tạo yêu cầu:  {{appointment_chossen.ngay_tao.strftime("%d/%m/%Y") }} </div>
-                        <div class="col">Giờ tạo: {{appointment_chossen.ngay_tao.strftime("%H:%M") }}</div>
+                    <div class="row text pt-1 gy-1">
+                        <div class="col">Ngày tạo yêu cầu: {{appointment_details[0].dat_lich.ngay_tao.strftime("%d/%m/%Y")}}</div>
+                        <div class="col">Giờ tạo: {{appointment_details[0].dat_lich.ngay_tao.strftime("%H:%M")}}</div>
                     </div>
-                    <div class="row text">
-                       <div class="col">Lịch hẹn:  {{appointment_chossen.gio_hen.strftime("%d/%m/%Y") }} </div>
-                        <div class="col">Giờ hen: {{appointment_chossen.gio_hen.strftime("%H:%M") }}</div>
+                    <div class="row text pt-1 gy-1">
+                        <div class="col">Lịch hẹn: {{appointment_details[0].dat_lich.gio_hen.strftime("%d/%m/%Y")}}</div>
+                        <div class="col">Giờ hẹn: {{appointment_details[0].dat_lich.gio_hen.strftime("%H:%M")}}</div>
                     </div>
                 </div>
                 <div class="container position-relative mt-4" style="background: #B2B2B2">
                     <div class="position-absolute translate-middle-y fw-bolder subtitle">Ghi chú</div>
                     <div class="pt-3 pb-1">
-                    <textarea class="form-control border-0" rows="2" id="comment" name="text"
-                              style="background: #B2B2B2" readonly> {{appointment_chossen.ghi_chu }} </textarea>
+                    <textarea class="form-control border-0" id="comment" name="text"
+                              style="background: #B2B2B2" readonly>{{appointment_details[0].dat_lich.ghi_chu}}</textarea>
                     </div>
                 </div>
                 <div class="container position-relative mt-4" style="background: white">
@@ -96,46 +94,50 @@
                     </div>
                     <div class="pt-4">
                         <div class="ps-1" style="height: 150px; max-height: 150px; overflow-y: auto" id="addArea">
-                        {%for ad in appointment_detail%}
-
-                            <div class="row g-2 pt-1 pb-1 align-items-center" style="width: 95%">
-                                <select class="form-select col me-3" name="selectService" disabled>
-                                    <option> {{ad.dich_vu.ten_dich_vu}} </option>
-                                </select>
-                                <select class="form-select col ms-3 me-3" name="selectTherapist" disabled>
-                                    <option> {{ad.ky_thuat_vien.user.ho_ten_user}} </option>
-                                </select>
-                                <button class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center"
-                                        style="width: 25px; height: 25px; visibility: hidden" name="remove"
-                                        onclick="removeService(this)">&times;
-                                </button>
-                            </div>
-                        {%endfor%}
+                            {%for ad in appointment_details%}
+                                <div class="row g-2 pt-1 pb-1 align-items-center" style="width: 95%">
+                                    <input class="col me-5 form-control" id="{{ad.dich_vu.id}}" value="{{ad.dich_vu.ten_dich_vu}}" style="height:" disabled>
+                                    {%if therapists == None%}
+                                        <select class="form-select col me-3" name="therapist" disabled>
+                                            {%if ad.ky_thuat_vien != None%}
+                                            <option value="{{ad.ky_thuat_vien.user.id}}" selected>
+                                                {{ad.ky_thuat_vien.user.ho_ten_user}}
+                                            </option>
+                                            {%endif%}
+                                        </select>
+                                    {%else%}
+                                        <select class="form-select col me-3" name="therapist">
+                                            <option value="" selected disabled>-- --</option>
+                                            {%for th in therapists%}
+                                                {%if th.dich_vu_chuyen_mon == ad.dich_vu.id%}
+                                                    <option value="{{th.user.id}}">
+                                                        {{th.user.ho_ten_user}}
+                                                    </option>
+                                                {%endif%}
+                                            {%endfor%}
+                                        </select>
+                                    {%endif%}
+                                </div>
+                            {%endfor%}
                         </div>
                     </div>
-                    <div class="row p-3 border-top border-3" style="background: white">
-                        <button class="btn btn-dark btn-sm col-md-5 text-nowrap text" style="visibility: hidden"
-                                id="addService" onclick="addService()">Thêm dịch vụ
-                        </button>
-                        <div class="col text-end align-middle col-md text">Trạng thái lịch hẹn:{{appointment_chossen.trang_thai_dat_lich.name}} </div>
+                    <div class="p-3 border-top border-3" style="background: white">
+                        <div class="align-middle text">Trạng thái lịch hẹn: {{appointment_details[0].dat_lich.trang_thai_dat_lich.name}}
+                        </div>
                     </div>
                 </div>
-                <div class="row pt-4 p-3" style="display: flex" id="btnChangeState">
-                    <button class="col btn btn-dark me-5 text" onclick="startUpdateAD({{appointment_chossen.id}})">Cập nhật lịch hẹn
-                    </button>
-                    <button class="col btn btn-dark ms-5 text">Tiến hành</button>
+                <div class="row p-3" style="display: flex; visibility:{%if appointment_details[0].dat_lich.trang_thai_dat_lich.name != 'CHO_XAC_NHAN' and
+                    appointment_details[0].dat_lich.trang_thai_dat_lich.name != 'DA_XAC_NHAN'%}hidden{%endif%}" id="btnChangeState">
+                    <a class="col btn btn-dark me-5 text" href="/appointments/{{id}}/cancel">Hủy lịch hẹn</a>
+                    {%if therapists != None%}
+                    <button class="col btn btn-dark ms-5 text" onclick="successAppointment({{id}})">Xác nhận lịch hẹn</button>
+                    {%else%}
+                    <a class="col btn btn-dark ms-5 text" href="/appointments/{{id}}/carryOut">Tiến hành lịch hẹn</a>
+                    {%endif%}
                 </div>
-                <div class="row pt-4 p-3" style="display: none" id="btnForUpdate">
-                    <button class="col btn btn-dark me-5 text">Xác nhận cập nhật</button>
-                    <button class="col btn btn-dark ms-5 text" onclick="cancelUpdateAD({{id}})">Hủy cập nhật</button>
-                </div>
+                <div class="alert alert-danger text-center" id="alertSelect" style="display:none"></div>
             </div>
         </div>
-        {%if flag%}
-        <script>
-            changeForUpdateAD()
-        </script>
-        {%endif%}
         {%endif%}
     </div>
 </div>
