@@ -10,6 +10,14 @@ def index():
     images = os.listdir(image_folder)
     return render_template('index.html', images=images)
 
+@app.route('/index_services')
+def index_services():
+    return render_template('index_services.html')
+
+@app.route('/booking')
+def booking():
+    return render_template('booking.html')
+
 @app.route('/appointments/<int:id>')
 def appointment(id):
     kw = request.args.get("search")

@@ -1,0 +1,222 @@
+/*
+ * Globals
+ */
+
+
+/* Custom default button */
+.btn-secondary,
+.btn-secondary:hover,
+.btn-secondary:focus {
+  color: #333;
+  text-shadow: none; /* Prevent inheritance from `body` */
+}
+
+
+/*
+ * Base structure
+ */
+
+html, body {
+  margin: 10;
+  height: 100%;
+  scroll:start;
+  scroll-behavior: smooth;       /* cuộn mượt */
+  scroll-snap-type: y mandatory; /* bắt dính theo trục dọc */
+   background-color: #F7E7CE;
+}
+section {
+  height: 100vh;                 /* mỗi khối dài hơn màn hình */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: start;
+       /* dính vào đầu viewport */
+}
+
+body {
+  text-shadow: 0 .05rem .15rem rgba(0, 0, 0, .3);
+  box-shadow: inset 0 0 5rem rgba(0, 0, 0, .3);
+}
+
+.cover-container {
+  max-width: 100vw;
+}
+
+
+/*
+ * Header
+ */
+
+header {
+  position: fixed;       /* header cố định trên cùng */
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 15px;
+  transition: background-color 0.3s ease; /* hiệu ứng đổi màu mượt */
+  z-index: 999;
+}
+
+footer {
+  width: 100%;
+}
+
+/* Màu ban đầu (giống section 1) */
+header.default {
+  color: white;
+}
+
+/* Màu khi cuộn xuống */
+header.scrolled {
+  background-color: #000000; /* màu sáng */
+  }
+
+.nav-masthead .nav-link {
+  font-weight: 700;
+  color: rgba(255, 255, 255, .5);
+  background-color: transparent;
+  border-bottom: .25rem solid transparent;
+}
+
+.nav-masthead .nav-link:hover,
+.nav-masthead .nav-link:focus {
+  border-bottom-color: rgba(255, 255, 255, .25);
+}
+
+.nav-masthead .nav-link + .nav-link {
+  margin-left: 1rem;
+}
+
+.nav-masthead .active {
+  color: #fff;
+  border-bottom-color: #fff;
+}
+
+.hero-section {
+  position: relative;
+  height: 250vh; /* hoặc chiều cao bạn muốn */
+  overflow: hidden;
+  display: flex;
+  justify-content: center; /* căn giữa ngang */
+  align-items: center;     /* căn giữa dọc */
+  text-align: center;
+}
+
+.video-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.4);
+  z-index: -1;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  color: white;
+}
+
+#dichvuspa, #dichvulamdep, #image_spa, #customer_fb{
+  height: 130vh;
+  background-color: #FAF3E0; /* màu trắng kem nhẹ */
+  margin-top: 10px;          /* khoảng cách phía trên */
+  padding: 30px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2); /* bóng mờ nhẹ */
+}
+
+#dichvulamdep,#customer_fb{
+  background-color: #E6F2F0;
+}
+
+.custom-btn {
+  background-color: white;
+  color: black;
+  border: 2px solid black;
+  padding: 10px 20px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.custom-btn:hover {
+  background-color: black;
+  color: #FAF3E0; /* màu kem nhẹ */
+  border-color: black;
+}
+
+ul.list-unstyled li a {
+    color: #000000;           /* chữ đen */
+    text-decoration: none;    /* bỏ gạch chân */
+    padding: 8px 12px;        /* khoảng cách cho đẹp */
+    border-radius: 6px;       /* bo góc mềm mại */
+    display: inline-block;    /* để nền bao quanh chữ */
+    font-weight:700;
+    font-size: 17px;
+}
+
+ul.list-unstyled li a:hover {
+    color: #2C2C2C;           /* chữ xám đậm hơn khi hover */
+    background-color: #FFE4E1; /* nền hồng pastel khi hover */
+}
+
+ul.list-unstyled li div {
+    background-color: #F7E7CE; /* vàng champagne */
+    color: #2C2C2C;            /* xám than đậm, dễ đọc hơn */
+    padding: 10px;
+    border-radius: 6px;
+}
+
+/* Icon đặt lịch */
+#schedule-icon {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #F7E7CE; /* nền vàng champagne nhẹ */
+  color: #000;
+  font-size: 28px;
+  padding: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+
+/* Ô đặt lịch */
+/* Icon đặt lịch */
+#schedule-icon {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #F7E7CE;
+  font-size: 30px;
+  padding: 15px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+
+#booking-overlay {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  display:none; z-index:1050;
+}
+.overlay-bg {
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.5);
+}
+.overlay-content {
+  position:relative; height:100%;
+  display:flex; justify-content:center; align-items:center;
+}
+.booking-form {
+  background:#fff; padding:30px; border-radius:12px;
+  max-width:600px; width:100%;
+  box-shadow:0 0 15px rgba(0,0,0,0.3);
+}

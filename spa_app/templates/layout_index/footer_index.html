@@ -1,0 +1,57 @@
+<footer id="footer-main" class="w-100 text-white bg-secondary mt-auto fs-6 ">
+
+    <!-- Icon đặt lịch -->
+    <div id="schedule-icon">📅</div>
+    <div class="container py-4">
+        <div class="row">
+            <!-- Cột 1 -->
+            <div class="col-md-4 text-start">
+                <h5>Giới thiệu</h5>
+                <p>Thông tin ngắn gọn về công ty hoặc website.</p>
+            </div>
+
+            <!-- Cột 2 -->
+            <div class="col-md-4 text-center">
+                <h5>Liên Kết Nhanh</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-decoration-none text-white">Trang Chủ</a></li>
+                    <li><a href="#" class="text-decoration-none text-white">Dịch Vụ</a></li>
+                    <li><a href="#" class="text-decoration-none text-white">Đặt Lịch</a></li>
+                </ul>
+            </div>
+
+            <!-- Cột 3 -->
+            <div class="col-md-4 text-end">
+                <h5>Liên hệ</h5>
+                <ul class="list-unstyled">
+                    <li>Email: info@example.com</li>
+                    <li>Phone: 0123 456 789</li>
+                    <li>Địa chỉ: HCMC, Việt Nam</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+
+        const icon = document.getElementById("schedule-icon");
+        const overlay = document.getElementById("booking-overlay");
+        const form = document.querySelector(".booking-form");
+
+        // Mở overlay khi click icon
+        if(icon){
+          icon.addEventListener("click", () => {
+            overlay.style.display = "block";
+          });
+        }
+
+        // Đóng overlay khi click bất cứ đâu ngoài form
+        overlay.addEventListener("click", (e) => {
+          if (!form.contains(e.target)) {
+            overlay.style.display = "none";
+          }
+        });
+    </script>
+
+</footer>

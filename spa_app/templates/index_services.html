@@ -1,0 +1,154 @@
+{% extends 'layout_index/base_index.html' %}
+
+{% block title %}Dịch vụ{% endblock %}
+
+{% block head %}
+
+
+<style>
+    html, body{
+        height:100%;
+        padding-top: 5% !important;
+
+    }
+
+    header{
+        background:#000;
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center h-100 ">
+    <div class="w-100">
+        <!-- Khối tiêu đề -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-8 text-center">
+                <h1 class="fw-bold">Dịch vụ</h1>
+            </div>
+        </div>
+
+        <!-- Hai khối nằm ngang -->
+        <div class="row justify-content-center align-items-stretch">
+            <!-- Dịch vụ làm đẹp -->
+            <div class="p-5 col-md-5 mb-4 me-5"
+                 style="border-radius:15px; background-color:#FAF9F6; font-weight:500; font-size:15p">
+                <div class="service-box">
+                    <h4 class="mb-3">Dịch Vụ Làm Đẹp</h4>
+                    <ul class="list-unstyled text-start">
+                        <li>
+                            <a data-bs-toggle="collapse" href="#munThamNam">
+                                Điều trị mụn – thâm – nám
+                            </a>
+                            <div class="collapse mt-2" id="munThamNam">
+                                <p>Liệu trình điều trị chuyên sâu bằng công nghệ hiện đại, giúp giảm mụn và mờ thâm
+                                    nám.</p>
+                            </div>
+                        </li>
+
+                        <li>
+                            <a data-bs-toggle="collapse" href="#trietLong">
+                                Triệt lông công nghệ cao
+                            </a>
+                            <div class="collapse mt-2" id="trietLong">
+                                <p>Sử dụng công nghệ laser tiên tiến, an toàn và hiệu quả lâu dài.</p>
+                            </div>
+                        </li>
+
+                        <li>
+                            <a data-bs-toggle="collapse" href="#chamSocDa">
+                                Chăm sóc da mặt chuyên sâu
+                            </a>
+                            <div class="collapse mt-2" id="chamSocDa">
+                                <p>Liệu trình dưỡng da, làm sạch và tái tạo da mặt, giúp da sáng khỏe.</p>
+                            </div>
+                        </li>
+
+                        <li>
+                            <a data-bs-toggle="collapse" href="#phunXam">
+                                Phun xăm thẩm mỹ
+                            </a>
+                            <div class="collapse mt-2" id="phunXam">
+                                <p>Dịch vụ phun xăm tự nhiên, an toàn, tạo đường nét sắc sảo cho khuôn mặt.</p>
+                            </div>
+                        </li>
+
+                        <li>
+                            <a data-bs-toggle="collapse" href="#noiMi">
+                                Nối mi
+                            </a>
+                            <div class="collapse mt-2" id="noiMi">
+                                <p>Kỹ thuật nối mi hiện đại, tạo hàng mi cong dài và quyến rũ.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Dịch vụ spa -->
+            <div class="p-5 col-md-5 mb-4 me-5"
+                 style="border-radius:15px; background-color:#FAF9F6;  font-weight:500; font-size:15p;">
+                <div class="service-box">
+                    <h4 class="mb-3">Dịch Vụ Làm Đẹp</h4>
+                    <ul class="list-unstyled text-start">
+                        <li>
+                            <a data-bs-toggle="collapse" href="#munThamNam">
+                                Điều trị mụn – thâm – nám
+                            </a>
+                            <div class="collapse mt-2" id="munThamNam">
+                                <p>Liệu trình điều trị chuyên sâu bằng công nghệ hiện đại, giúp giảm mụn và mờ thâm
+                                    nám.</p>
+                            </div>
+                        </li>
+
+                        <li>
+                            <a data-bs-toggle="collapse" href="#trietLong">
+                                Triệt lông công nghệ cao
+                            </a>
+                            <div class="collapse mt-2 " id="trietLong">
+                                <p>Sử dụng công nghệ laser tiên tiến, an toàn và hiệu quả lâu dài.</p>
+                            </div>
+                        </li>
+
+                        <li>
+                            <a data-bs-toggle="collapse" href="#chamSocDa">
+                                Chăm sóc da mặt chuyên sâu
+                            </a>
+                            <div class="collapse mt-2 " id="chamSocDa">
+                                <p>Liệu trình dưỡng da, làm sạch và tái tạo da mặt, giúp da sáng khỏe.</p>
+                            </div>
+                        </li>
+
+                        <li>
+                            <a data-bs-toggle="collapse" href="#phunXam" ">
+                            Phun xăm thẩm mỹ
+                            </a>
+                            <div class="collapse mt-2 " id="phunXam">
+                                <p>Dịch vụ phun xăm tự nhiên, an toàn, tạo đường nét sắc sảo cho khuôn mặt.</p>
+                            </div>
+                        </li>
+
+                        <li>
+                            <a data-bs-toggle="collapse" href="#noiMi" ">
+                            Nối mi
+                            </a>
+                            <div class="collapse mt-2 " id="noiMi">
+                                <p>Kỹ thuật nối mi hiện đại, tạo hàng mi cong dài và quyến rũ.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+</div>
+
+{% endblock %}

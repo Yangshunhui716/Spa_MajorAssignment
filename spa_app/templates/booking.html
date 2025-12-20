@@ -1,0 +1,106 @@
+{% block head %}
+<link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}">
+{%endblock%}
+
+<div id="booking-overlay" style="display:none;">
+    <div class="overlay-bg"></div>
+    <div class="overlay-content">
+        <div class="booking-form">
+            <div class="booking-form">
+                <h2 class="text-center mb-4">Đặt lịch</h2>
+                <div class="row text-start">
+                    <!-- Cột trái -->
+                    <div class="col-md-6 d-flex flex-column">
+                        <div class="form-block">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label>Họ tên</label>
+                                    <input id="name" type="text" class="form-control"/>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Ngày đặt lịch</label>
+                                    <input id="date" type="date" class="form-control"/>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Giờ đặt lịch</label>
+                                    <input id="time" type="time" class="form-control"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-block">
+                            <label>Số điện thoại</label>
+                            <input id="phone" type="tel" class="form-control"/>
+                        </div>
+                        <div class="form-block">
+                            <label>Email</label>
+                            <input id="email" type="email" class="form-control"/>
+                        </div>
+                        <div class="form-block flex-grow-1">
+                            <label>Ghi chú</label>
+                            <textarea id="note" class="form-control" rows="6"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Cột phải -->
+                    <div class="col-md-6">
+                        <div class="service-block">
+                            <div>
+                                <label class="mb-2" style="font-weight:bold">Dịch vụ</label>
+
+                                <!-- Danh sách dịch vụ -->
+                                <div id="service-list" class="mb-2">
+                                    <div class="d-flex align-items-center mb-2 service-item">
+                                        <select class="form-select service-select">
+                                            <option value="20">Massage Mặt - 20 phút</option>
+                                            <option value="30">Điều trị mụn - 30 phút</option>
+                                            <option value="25">Triệt lông - 25 phút</option>
+                                        </select>
+                                        <button type="button" class="remove-btn">×</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer dịch vụ -->
+                            <div class="service-footer">
+                                <button type="button" class="add-service" id="add-service-btn">Thêm dịch vụ</button>
+                                <div>
+                                    <span>Tổng thời gian dự kiến: </span>
+                                    <span id="duration">20 phút</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="booking-btn" class="btn btn-dark w-100 mt-4" type="button">Đặt lịch</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{%block footer%}
+<script src="{{ url_for('static', filename='js/booking.js') }}">
+
+    document.addEventListener('DOMContentLoaded', () => {
+  const openBtn = document.getElementById('open-booking');
+  const overlay = document.getElementById('booking-overlay');
+  const form = document.querySelector(".booking-form");
+
+  // Mở overlay khi bấm nút
+  openBtn.addEventListener('click', (e) => {
+    e.preventDefault(); // chặn cuộn trang
+    overlay.style.display = "block";
+  });
+
+  // Đóng overlay khi click ngoài form
+  overlay.addEventListener('click', (e) => {
+    if (!form.contains(e.target)) {
+      overlay.style.display = "none";
+    }
+  });
+});
+</script>
+
+
+{%endblock%}
