@@ -126,6 +126,7 @@
                         </div>
                     </div>
                 </div>
+                <div class="alert alert-danger text-center" id="alertSelect" style="display:none"></div>
                 <div class="row p-3" style="display: flex; visibility:{%if appointment_details[0].dat_lich.trang_thai_dat_lich.name != 'CHO_XAC_NHAN' and
                     appointment_details[0].dat_lich.trang_thai_dat_lich.name != 'DA_XAC_NHAN'%}hidden{%endif%}" id="btnChangeState">
                     <a class="col btn btn-dark me-5 text" href="/appointments/{{id}}/cancel">Hủy lịch hẹn</a>
@@ -135,7 +136,6 @@
                     <a class="col btn btn-dark ms-5 text" href="/appointments/{{id}}/carryOut">Tiến hành lịch hẹn</a>
                     {%endif%}
                 </div>
-                <div class="alert alert-danger text-center" id="alertSelect" style="display:none"></div>
             </div>
         </div>
         {%endif%}

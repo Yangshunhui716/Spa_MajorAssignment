@@ -107,15 +107,14 @@
                     <div class="position-absolute translate-middle-y fw-bolder subtitle">Ghi chú dịch vụ</div>
                     <div class="pt-3 pb-1">
                         <input type="text" class="form-control border-0" id="serviceNote" style="background: #B2B2B2"
-                               readonly value="{{service_sheet_details[0].ghi_chu_ktv}}">
-
+                               readonly value="{%if service_sheet_details != None%}{{service_sheet_details[0].ghi_chu_ktv}}{%endif%}">
                     </div>
                 </div>
                 <div class="container position-relative mt-4" style="background: #B2B2B2" id="replyArea">
                     <div class="position-absolute translate-middle-y fw-bolder subtitle">Phản hồi của KH về dịch vụ
                     </div>
                     <div class="pt-3 pb-1">
-                    <textarea class="form-control border-0" id="customerReply" style="background: #B2B2B2" readonly>{{service_sheet_details[0].phan_hoi_khach_hang}}</textarea>
+                    <textarea class="form-control border-0" id="customerReply" style="background: #B2B2B2" readonly>{%if service_sheet_details != None%}{{service_sheet_details[0].phan_hoi_khach_hang}}{%endif%}</textarea>
                     </div>
                 </div>
                 <div class="row pt-4 p-3 " style="display: flex" id="btnUpdate">

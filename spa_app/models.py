@@ -82,9 +82,9 @@ class DichVu(BaseModel):
     thoi_gian_dich_vu = Column(Integer, nullable=False, default=0)
     gioi_han_khach = Column(Integer, nullable=False, default=5)
 
-
     phieu_dich_vu_detail = relationship("PhieuDichVuDetail", backref="dich_vu", lazy=True)
     dat_lich_detail = relationship("DatLichDetail", backref="dich_vu", lazy=True)
+    ma_giam_gia = relationship("MaGiamGia", backref="dich_vu", lazy=True)
 
 class KyThuatVien(db.Model):
     ma_ktv = Column(Integer, ForeignKey(User.id, ondelete='CASCADE'), primary_key=True, nullable=False)
@@ -145,9 +145,10 @@ class PhieuDichVuDetail(db.Model):
 
 
 
-
 class VAT(BaseModel):
     muc_vat = Column(Double, nullable=False, default=0.08)
+
+    hoa_don= relationship("HoaDon", backref="vat", lazy=True)
 
 
 class MaGiamGia(BaseModel):

@@ -1,16 +1,11 @@
 import os
 from flask import Flask, render_template, request, redirect, session, jsonify
-from spa_app import db, app
-from spa_app.dao import load_therapists, load_services, load_appointments, get_appointment_details, change_appointment_status, assign_therapists, update_sheet_detail
+from spa_app import db, app, utils
+from spa_app.dao import load_therapists, load_appointments, get_appointment_details, change_appointment_status, \
+    assign_therapists, update_sheet_detail, check_discount, load_service_sheets, get_service_sheet_details
 from spa_app.models import DatLich, DatLichDetail, PhieuDichVu, PhieuDichVuDetail, HoaDon, TrangThaiDatLich
 
 @app.route('/')
-def index():
-    image_folder = os.path.join(app.static_folder, "images")
-    images = os.listdir(image_folder)
-    return render_template('index.html', images=images)
-
-@app.route('/index_services')
 def index_services():
     return render_template('index_services.html')
 
@@ -26,7 +21,7 @@ def appointment(id):
     therapists = None
     if id > 0:
         appointment_details = get_appointment_details(id)
-        if appointment_details[0].dat_lich.trang_thai_dat_lich == TrangThaiDatLich.CHO_XAC_NHAN:
+        if appointment_details[0].dat_lich.trang_thai_dat_lich==TrangThaiDatLich.CHO_XAC_NHAN:
             therapists = load_therapists()
 
     return render_template("appointments.html", pages=1, id=id, kw=kw,
@@ -44,7 +39,7 @@ def success_appointment(id):
     selected_therapists = data['selectedTherapists']
 
     check = assign_therapists(id, selected_therapists)
-    if check == -1:
+    if check==-1:
         return jsonify({"status": 400, "err_msg": "Dữ liệu không hợp lệ"})
 
     change_appointment_status(id, TrangThaiDatLich.DA_XAC_NHAN)
@@ -70,8 +65,9 @@ def service_sheet(id):
     appointment_details = get_appointment_details(id)
     service_sheet_details = None
     if id > 0:
-        if PhieuDichVu.query.filter(PhieuDichVu.ma_dat_lich == id).first():
-            service_sheet_details = PhieuDichVuDetail.query.filter(PhieuDichVuDetail.ma_phieu_dich_vu == id).all()
+        if load_service_sheets(appointment_id=id):
+            sheet = load_service_sheets(appointment_id=id)
+            service_sheet_details = get_service_sheet_details(sheet.id)
     return render_template("serviceSheets.html", pages=1, id=id, kw=kw,
                            service_sheet_details=service_sheet_details,
                            appointments=appointments,
@@ -83,7 +79,10 @@ def update_service_sheet(id):
     kw = request.args.get("search")
     appointments = DatLich.query.all()
     appointment_details = get_appointment_details(id)
-    service_sheet_details = PhieuDichVuDetail.query.filter(PhieuDichVuDetail.ma_phieu_dich_vu == id).all()
+    service_sheet_details = None
+    if load_service_sheets(appointment_id=id):
+        sheet = load_service_sheets(appointment_id=id)
+        service_sheet_details = get_service_sheet_details(sheet.id)
     return render_template("serviceSheets.html", pages=1, id=id, kw=kw, flag=flag,
                            service_sheet_details=service_sheet_details,
                            appointments=appointments,
@@ -102,28 +101,64 @@ def success_service_sheet(id):
         "status": 200,
     })
 
-@app.route('/payments/<int:id>')
-def payment(id):
+@app.route('/invoices/<int:id>')
+def invoice(id):
+    kw = request.args.get("search")
     service_sheets = PhieuDichVu.query.all()
     service_sheet_detail = None
-    receiption = None
-    total_payment = None
+    receipt = None
+    invoice = None
+    total_tmp = None
 
     if id > 0:
-        receiption = HoaDon.query.filter(HoaDon.ma_phieu_dich_vu == id).first()
-        if receiption is not None:
-            total_payment = receiption.tong_thanh_toan
-        else:
-            total_payment = 0
         service_sheet_detail = PhieuDichVuDetail.query.filter(PhieuDichVuDetail.ma_phieu_dich_vu == id).all()
+        receipt = HoaDon.query.filter(HoaDon.ma_phieu_dich_vu == id).first()
+        if receipt is None:
+            invoice = session.get('invoice', {})
+            print(invoice)
+            if str(id) not in invoice:
+                invoice[str(id)] = {}
+                for s in service_sheet_detail:
+                    invoice[str(id)][str(s.dich_vu.id)] = {
+                        "ma_giam_gia": None,
+                        "muc_giam_gia": 0,
+                        "ma_dich_vu": s.dich_vu.id,
+                        "gia_dich_vu": s.dich_vu.gia_dich_vu,
+                    }
+                session["invoice"] = invoice
+                session.modified = True
+            total_tmp = utils.total(invoice=invoice[str(id)])
 
-    kw = request.args.get("search")
-    return render_template("payments.html", pages=1, id=id, kw=kw,
-                           receiption=receiption,
+    return render_template("invoices.html", pages=1, id=id, kw=kw,
                            service_sheets=service_sheets,
                            service_sheet_detail=service_sheet_detail,
-                           total_payment=total_payment)
+                           receipt=receipt,
+                           invoice=invoice,
+                           total_tmp=total_tmp)
 
+@app.route('/invoices/<int:id>/add_discount', methods=['PUT'])
+def add_discount(id):
+    discount = check_discount(request.json.get("ma_giam_gia"), request.json.get("ma_khach_hang"))
+    if discount==-1:
+        return jsonify({"status": 400, "err_msg": "Mã giảm giá không hợp lệ"})
+    elif discount==0:
+        return jsonify({"status": 400, "err_msg": "Mã giảm giá hết hạn sử dụng"})
+
+    invoice = session.get('invoice', {})
+    if invoice and str(id) in invoice and str(discount.dich_vu.id) in invoice[str(id)]:
+        if invoice[str(id)][str(discount.dich_vu.id)]["ma_giam_gia"] is not None:
+            return jsonify({"status": 400, "err_msg": "Mã giảm giá đang được áp dụng"})
+        invoice[str(id)][str(discount.dich_vu.id)]['ma_giam_gia']=discount.id
+        invoice[str(id)][str(discount.dich_vu.id)]['muc_giam_gia']=discount.muc_giam_gia
+        session.modified = True
+
+    else:
+        return jsonify({"status": 400, "err_msg": "Lỗi hệ thống"})
+
+    return jsonify(utils.total(invoice=invoice[str(id)]))
+
+# @app.route('/invoices/<int:id>/del_discount', methods=['DELETE'])
+# def del_discount(id):
 
 if __name__ == '__main__':
     with app.app_context():
