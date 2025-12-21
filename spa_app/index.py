@@ -6,6 +6,10 @@ from spa_app.dao import load_therapists, load_appointments, get_appointment_deta
 from spa_app.models import DatLich, DatLichDetail, PhieuDichVu, PhieuDichVuDetail, HoaDon, TrangThaiDatLich
 
 @app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/services')
 def index_services():
     return render_template('index_services.html')
 
