@@ -5,7 +5,6 @@ from sqlalchemy.orm import relationship
 from spa_app import db, app
 from enum import Enum as RoleEnum
 
-
 class UserRole(RoleEnum):
     USER = "USER"
     KHACH_HANG = "Khach_Hang"
@@ -43,6 +42,11 @@ class TrangThaiMaGiamGiaEnum(RoleEnum):
     DA_SU_DUNG = "DA_SU_DUNG"
     CHUA_SU_DUNG = "CHUA_SU_DUNG"
     DA_HET_HAN = "DA_HET_HAN"
+
+
+class PhuongThucThanhToanEnum(RoleEnum):
+    TIEN_MAT = "TIEN_MAT"
+    CHUYEN_KHOAN = "CHUYEN_KHOAN"
 
 
 class BaseModel(db.Model):
@@ -135,14 +139,12 @@ class PhieuDichVu(BaseModel):
     phieu_dich_vu_details = relationship("PhieuDichVuDetail", backref="phieu_dich_vu", lazy=True)
 
 
-
 class PhieuDichVuDetail(db.Model):
     ma_phieu_dich_vu = Column(Integer, ForeignKey(PhieuDichVu.id, ondelete='CASCADE'), primary_key=True, nullable=False)
     ma_dich_vu = Column(Integer, ForeignKey(DichVu.id, ondelete='CASCADE'), primary_key=True, nullable=False)
     thoi_gian_cap_nhat = Column(DateTime)
     ghi_chu_ktv = Column(Text, default="")
     phan_hoi_khach_hang = Column(Text, default="")
-
 
 
 class VAT(BaseModel):
@@ -169,11 +171,19 @@ class HoaDon(BaseModel):
     ma_thu_ngan = Column(Integer, ForeignKey(User.id), nullable=False)
     ma_phieu_dich_vu = Column(Integer, ForeignKey(PhieuDichVu.id, ondelete='CASCADE'), nullable=False)
     ma_vat = Column(Integer, ForeignKey(VAT.id), nullable=False)
-    ma_giam_gia = Column(Integer, ForeignKey(MaGiamGia.id), nullable=False)
     tong_gia_dich_vu = Column(Double, nullable=False, default=0)
+    tong_giam_gia = Column(Double, nullable=False, default=0)
     tong_thanh_toan = Column(Double, nullable=False, default=0)
+    phuong_thuc_thanh_toan = Column(Enum(PhuongThucThanhToanEnum), nullable=False, default=PhuongThucThanhToanEnum.TIEN_MAT)
+    so_tien_nhan = Column(Double, nullable=False, default=0)
 
     phieu_dich_vu = relationship("PhieuDichVu", backref="hoa_don", lazy=True)
+
+
+class HoaDonMaGiamGia(db.Model):
+    ma_hoa_don = Column(Integer, ForeignKey(HoaDon.id, ondelete='CASCADE'), primary_key=True, nullable=False)
+    ma_giam_gia = Column(Integer, ForeignKey(MaGiamGia.id), primary_key=True, nullable=False)
+
 
 if __name__ == "__main__":
     with app.app_context():

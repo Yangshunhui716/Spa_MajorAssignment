@@ -107,6 +107,7 @@ def success_service_sheet(id):
 
 @app.route('/invoices/<int:id>')
 def invoice(id):
+    flag = False
     kw = request.args.get("search")
     service_sheets = PhieuDichVu.query.all()
     service_sheet_detail = None
@@ -119,7 +120,6 @@ def invoice(id):
         receipt = HoaDon.query.filter(HoaDon.ma_phieu_dich_vu == id).first()
         if receipt is None:
             invoice = session.get('invoice', {})
-            print(invoice)
             if str(id) not in invoice:
                 invoice[str(id)] = {}
                 for s in service_sheet_detail:
@@ -133,7 +133,7 @@ def invoice(id):
                 session.modified = True
             total_tmp = utils.total(invoice=invoice[str(id)])
 
-    return render_template("invoices.html", pages=1, id=id, kw=kw,
+    return render_template("invoices.html", pages=1, id=id, kw=kw, flag=flag,
                            service_sheets=service_sheets,
                            service_sheet_detail=service_sheet_detail,
                            receipt=receipt,
@@ -161,8 +161,34 @@ def add_discount(id):
 
     return jsonify(utils.total(invoice=invoice[str(id)]))
 
-# @app.route('/invoices/<int:id>/del_discount', methods=['DELETE'])
-# def del_discount(id):
+@app.route('/invoices/<int:id>/remove_discount', methods=['PUT'])
+def remove_discount(id):
+    invoice = session.get('invoice', {})
+    service_id = request.json.get("ma_dich_vu")
+
+    if invoice and str(id) in invoice and str(service_id) in invoice[str(id)]:
+        if invoice[str(id)][str(service_id)]["ma_giam_gia"] is None:
+            return jsonify({"status": 400, "err_msg": "Dịch vụ đang không sử dụng mã giảm giá"})
+        else :
+            invoice[str(id)][str(service_id)]["ma_giam_gia"] = None
+            invoice[str(id)][str(service_id)]["muc_giam_gia"] = 0
+            session.modified = True
+    else:
+        return jsonify({"status": 400, "err_msg": "Lỗi hệ thống"})
+
+    return jsonify(utils.total(invoice=invoice[str(id)]))
+
+@app.route('/invoices/<int:id>/payment')
+def payment(id):
+    flag=True
+    service_sheet_detail = get_service_sheet_details(service_sheet_id=id)
+    invoice = session.get('invoice', {})
+    print(invoice[str(id)])
+    total_tmp = utils.total(invoice=invoice[str(id)])
+    return render_template("invoices.html", id=id, flag=flag,
+                           service_sheet_detail=service_sheet_detail,
+                           invoice=invoice,
+                           total_tmp=total_tmp)
 
 if __name__ == '__main__':
     with app.app_context():

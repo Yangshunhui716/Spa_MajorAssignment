@@ -3,6 +3,7 @@
 {%block content%}
 <div id="main-body" class="row g-3 gy-4 m-3 mb-5">
     <div class="col-lg">
+        {%if flag == false%}
         <div class="container position-relative area">
             <div class="position-absolute translate-middle-y fw-bolder title">Danh sách thanh toán</div>
             <div class="pt-4 pb-2">
@@ -49,33 +50,84 @@
                 </div>
             </div>
         </div>
+        {%endif%}
+
+        {%if flag == true%}
+        <div class="container position-relative area">
+            <div class="position-absolute translate-middle-y fw-bolder title">Phương thức thanh toán</div>
+            <div class="pt-5 pb-2">
+                <div class="container position-relative mb-3" style="background: #B2B2B2">
+                    <div class="position-absolute translate-middle-y fw-bolder subtitle">Số tiền cần thanh toán</div>
+                    <div class="pt-3 pb-1">
+                        <input type="text" class="form-control border-0 text-center subtitle"
+                               style="background: #B2B2B2"
+                               readonly value="{{'{:,.0f}'.format(total_tmp['total_amount'])}} VND">
+                        <input type="hidden" id="totalReal" value="{{total_tmp['total_amount']}}">
+                    </div>
+                </div>
+                <ul class="nav nav-tabs bg-dark">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#cash">Tiền mặt</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#tranfer">Chuyển khoản</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane container active" id="cash" style="background: white">
+                        <div class="p-3 pt-4">
+                            <label class="form-label">Số tiền khách đưa (VND)</label>
+                            <input type="text" id="paidDisplay" class="form-control" inputmode="numeric"
+                                   placeholder="Nhập số tiền" oninput="handlePaidInput(this)">
+                            <input type="hidden" id="paidReal" name="paid_amount">
+                        </div>
+                        <div class="p-3 pb-5">
+                            <label class="form-label">Tiền thừa / Còn thiếu (VND)</label>
+                            <input type="text" id="resultDisplay" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="tab-pane container fade" id="tranfer" style="background: white">Tính năng chưa có :))</div>
+                </div>
+            </div>
+        </div>
+        {%endif%}
     </div>
 
     <div class="col-lg">
         {%if id>0%}
         <div class="container position-relative area">
             <div class="position-absolute translate-middle-y fw-bolder title">Hóa đơn</div>
-            <button type="button" class="btn btn-dark d-flex align-items-center
+            {%if flag==false%}
+            <div class="btn btn-dark d-flex align-items-center
         justify-content-center me-4 position-absolute end-0 translate-middle-y"
-                    style="width: 25px; height: 25px" onclick="closeInvoice()">&times;
-            </button>
+                 style="width: 25px; height: 25px" onclick="closeInvoice()">&times;
+            </div>
+            {%endif%}
             <div class="container pt-4 pb-2">
                 <div class="pt-2 pb-4">
-                    <div class="subtitle">Khách hàng: {{service_sheet_detail[0].phieu_dich_vu.dat_lich.khach_hang.ho_ten_user}}</div>
+                    <div class="subtitle">Khách hàng:
+                        {{service_sheet_detail[0].phieu_dich_vu.dat_lich.khach_hang.ho_ten_user}}
+                    </div>
                     <div class="row row-col-2 text">
-                        <div class="col-6">Email: {{service_sheet_detail[0].phieu_dich_vu.dat_lich.khach_hang.email_user}}</div>
-                        <div class="col-6">Số điện thoại: {{service_sheet_detail[0].phieu_dich_vu.dat_lich.khach_hang.sdt_user}}</div>
+                        <div class="col-6">Email:
+                            {{service_sheet_detail[0].phieu_dich_vu.dat_lich.khach_hang.email_user}}
+                        </div>
+                        <div class="col-6">Số điện thoại:
+                            {{service_sheet_detail[0].phieu_dich_vu.dat_lich.khach_hang.sdt_user}}
+                        </div>
                         <div class="col-6">Lịch hẹn ngày:
                             {{service_sheet_detail[0].phieu_dich_vu.dat_lich.gio_hen.strftime("%d/%m/%Y")}}
                         </div>
-                        <div class="col-6">lúc: {{service_sheet_detail[0].phieu_dich_vu.dat_lich.gio_hen.strftime("%H:%M")}}</div>
+                        <div class="col-6">lúc:
+                            {{service_sheet_detail[0].phieu_dich_vu.dat_lich.gio_hen.strftime("%H:%M")}}
+                        </div>
                         <div class="col-6">Thời gian lập hóa đơn:
-                            {%if receipt!=None%}
+                            {%if receipt!=None and flag==false%}
                             {{receipt.ngay_tao.strftime("%H:%m -%d/%m/%Y")}}
                             {%endif%}
                         </div>
                         <div class="col-6">Thời gian thanh toán:
-                            {%if receipt!=None%}
+                            {%if receipt!=None and flag==false%}
                             Chưa có thuộc tính
                             {%endif%}
                         </div>
@@ -91,17 +143,24 @@
                             <th class="servicessheet-table-col">Giảm giá</th>
                         </tr>
                         </thead>
-                        <tbody class="table-light">
+                        <tbody class="table-light align-middle">
                         {%for sd in service_sheet_detail%}
                         <tr>
                             <td>{{loop.index}}</td>
                             <td class="table-first-col">{{sd.dich_vu.ten_dich_vu}}</td>
-                            <td class="servicessheet-table-col text-end">{{"{:,.0f}".format(sd.dich_vu.gia_dich_vu)}}</td>
+                            <td class="servicessheet-table-col text-end">{{"{:,.0f}".format(sd.dich_vu.gia_dich_vu)}}
+                            </td>
                             <td class="servicessheet-table-col text-end">
-                                {%if receipt != None%}
-                                    0
+                                {%if receipt != None and flag==false%}
+                                0
                                 {%else%}
-                                    {{"{:,.0f}".format(invoice[id|string][sd.dich_vu.id|string]["gia_dich_vu"]*invoice[id|string][sd.dich_vu.id|string]["muc_giam_gia"])}}
+                                {{"{:,.0f}".format(invoice[id|string][sd.dich_vu.id|string]["gia_dich_vu"]*invoice[id|string][sd.dich_vu.id|string]["muc_giam_gia"])}}
+                                {%if invoice[id|string][sd.dich_vu.id|string]["muc_giam_gia"] != 0 and flag==false%}
+                                <div class="btn btn-sm rounded-circle justify-content-center align-items-center"
+                                     onclick="removeDiscount({{id}},{{invoice[id|string][sd.dich_vu.id|string]['ma_dich_vu']}})">
+                                    &times;
+                                </div>
+                                {%endif%}
                                 {%endif%}
                             </td>
                         </tr>
@@ -113,25 +172,25 @@
                     <div class="col-6">Tổng giá dịch vụ</div>
                     <div class="col-6 text-end" id="temporary">
                         {%if receipt%}
-                            {{"{:,.0f}".format(receipt.tong_gia_dich_vu)}}
+                        {{"{:,.0f}".format(receipt.tong_gia_dich_vu)}}
                         {%else%}
-                            {{"{:,.0f}".format(total_tmp["temporary"])}}
+                        {{"{:,.0f}".format(total_tmp["temporary"])}}
                         {%endif%}
                     </div>
                     <div class="col-6">Tổng giảm giá được áp dụng</div>
                     <div class="col-6 text-end" id="total_discount">
                         {%if receipt%}
-                            {{"{:,.0f}".format(receipt.tong_gia_dich_vu - receipt.tong_thanh_toan)}}
+                        {{"{:,.0f}".format(receipt.tong_gia_dich_vu - receipt.tong_thanh_toan)}}
                         {%else%}
-                            {{"{:,.0f}".format(total_tmp["total_discount"])}}
+                        {{"{:,.0f}".format(total_tmp["total_discount"])}}
                         {%endif%}
                     </div>
                     <div class="col-6">Thuế VAT</div>
-                    <div class="col-6 text-end"  id="vat">
+                    <div class="col-6 text-end" id="vat">
                         {%if receipt%}
-                            {{"%.0f"|format(receipt.vat.muc_vat*100)}}&#37;
+                        {{"%.0f"|format(receipt.vat.muc_vat*100)}}&#37;
                         {%else%}
-                            {{"%.0f"|format(total_tmp["vat"] * 100)}}&#37;
+                        {{"%.0f"|format(total_tmp["vat"] * 100)}}&#37;
                         {%endif%}
                     </div>
                 </div>
@@ -139,20 +198,29 @@
                     <div class="col-6">Tổng thanh toán</div>
                     <div class="col-6 text-end" id="total_amount">
                         {%if receipt%}
-                            {{"{:,.0f}".format(receipt.tong_thanh_toan)}} VND
+                        {{"{:,.0f}".format(receipt.tong_thanh_toan)}} VND
                         {%else%}
-                            {{"{:,.0f}".format(total_tmp["total_amount"])}} VND
+                        {{"{:,.0f}".format(total_tmp["total_amount"])}} VND
                         {%endif%}
                     </div>
                 </div>
                 {%if service_sheet_detail[0].phieu_dich_vu.dat_lich.trang_thai_dat_lich.name == "DANG_THUC_HIEN"%}
                 <div class="alert alert-danger text-center" id="alertSelect" style="display:none"></div>
                 <div class="row p-3">
+                    {% if flag==false%}
                     <div class="col me-3 row">
-                        <input class="form-control" id="find_discount" type="text" placeholder="Mã giảm giá" style="width: 15vw">
-                        <button class="btn btn-dark btn-sm text col" style="width: 30px" onclick="findDiscount({{id}},{{service_sheet_detail[0].phieu_dich_vu.dat_lich.khach_hang.id}})">Tìm</button>
+                        <input class="form-control" id="find_discount" type="text" placeholder="Mã giảm giá"
+                               style="width: 15vw">
+                        <button class="btn btn-dark btn-sm text col" style="width: 30px"
+                                onclick="findDiscount({{id}},{{service_sheet_detail[0].phieu_dich_vu.dat_lich.khach_hang.id}})">
+                            Tìm
+                        </button>
                     </div>
-                    <button class="col btn btn-dark text">Thanh toán</button>
+                    <a class="col btn btn-dark text fw-bold" href="/invoices/{{id}}/payment">Thanh toán</a>
+                    {%else%}
+                    <a class="col btn btn-dark text fw-bold me-5" href="/invoices/{{id}}">Quay lại</a>
+                    <a class="col btn btn-dark text fw-bold ms-5" href="">Hoàn tất thanh toán</a>
+                    {%endif%}
                 </div>
                 {%endif%}
             </div>

@@ -11,7 +11,6 @@ def total(invoice):
         for i in service_list:
             temporary += i["gia_dich_vu"]
             total_discount += (i["gia_dich_vu"]*(i["muc_giam_gia"]))
-            print(total_discount)
         total_amount = (temporary - total_discount)*(1+vat)
 
     return {
