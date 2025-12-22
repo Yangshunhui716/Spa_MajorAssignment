@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 
 from spa_app import db, app
 from enum import Enum as RoleEnum
+from flask_login import UserMixin
 
 class UserRole(RoleEnum):
     USER = "USER"
@@ -55,7 +56,7 @@ class BaseModel(db.Model):
     ngay_tao = Column(DateTime, nullable=False, default=datetime.now)
 
 
-class User(BaseModel):
+class User(BaseModel, UserMixin):
     ho_ten_user = Column(String(150), nullable=False)
     sdt_user = Column(Integer, nullable=False, unique=True)
     email_user = Column(String(150), nullable=False)

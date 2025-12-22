@@ -8,14 +8,13 @@ import hashlib
 
 def auth_user(username,password):
     password = hashlib.md5(password.encode("utf-8")).hexdigest()
-    return User.query.filter(User.username.__eq__(username), User.password.__eq__(password)).first()
+    return User.query.filter(User.ho_ten_user.__eq__(username), User.password_user.__eq__(password)).first()
 
-def add_user(name, username,password,avatar):
+def add_user(name, username,password,avatar, email, phone):
     password = hashlib.md5(password.encode('utf-8')).hexdigest()
-    u = User(name=name, username=username,password=password, avatar=avatar)
+    u = User(ho_ten_user = name , password_user = password, sdt_user = phone, email_user = email,tai_khoan_user = username)
     db.session.add(u)
     db.session.commit()
-
 
 def get_user_by_id(user_id):
     return User.query.get(user_id)
