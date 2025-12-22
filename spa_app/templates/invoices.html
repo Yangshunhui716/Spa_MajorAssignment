@@ -2,7 +2,7 @@
 
 {%block content%}
 <div id="main-body" class="row g-3 gy-4 m-3 mb-5">
-    <div class="col-lg">
+    <div class="col-lg no-print">
         {%if flag == false%}
         <div class="container position-relative area">
             <div class="position-absolute translate-middle-y fw-bolder title">Danh sách thanh toán</div>
@@ -13,13 +13,53 @@
                                onchange="search()" value="{%if kw!=None%}{{kw}}{%endif%}">
                     </div>
                     <div class="col pt-1">
-                        <ul class="pagination justify-content-end col pagination-sm">
-                            <li class="page-item"><a class="page-link" href="#"><</a></li>
-                            {%for i in range(1, pages+1)%}
-                            <li class="page-item"><a class="page-link" href="/?page={{i}}">{{i}}</a></li>
-                            {%endfor%}
-                            <li class="page-item"><a class="page-link" href="#">></a></li>
-                        </ul>
+                        <nav aria-label="Pagination">
+                            <ul class="pagination pagination-sm justify-content-center">
+                                <li class="page-item {{'disabled' if page <= 1}}">
+                                    <a class="page-link" href="?page={{page-1}}{%if kw != None%}&search={{kw}}{%endif%}">
+                                        &laquo;
+                                    </a>
+                                </li>
+                                {% if page > 2 %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{%if kw != None%}&search={{kw}}{%endif%}">
+                                        1
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% if page > 3 %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">…</span>
+                                </li>
+                                {% endif %}
+                                {% for p in range(page-1, page+2) %}
+                                {% if 1 <= p <= pages %}
+                                <li class="page-item {{'active' if p == page}}">
+                                    <a class="page-link" href="?page={{p}}{%if kw != None%}&search={{kw}}{%endif%}">
+                                        {{p}}
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% endfor %}
+                                {% if page < pages - 2 %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">…</span>
+                                </li>
+                                {% endif %}
+                                {% if page < pages - 1 %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{pages}}{%if kw != None%}&search={{kw}}{%endif%}">
+                                        {{pages}}
+                                    </a>
+                                </li>
+                                {% endif %}
+                                <li class="page-item {{'disabled' if page >= pages}}">
+                                    <a class="page-link" href="?page={{page+1}}{%if kw != None%}&search={{kw}}{%endif%}">
+                                        &raquo;
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -27,14 +67,8 @@
                         <thead class="table-dark text-center align-middle">
                         <tr>
                             <th class="table-first-col">Khách hàng</th>
-                            <th class="servicessheet-table-col">Thời gian dự kiến hoàn tất</th>
-                            <th class="servicessheet-table-col">
-                                <div class="dropdown-toggle" data-bs-toggle="dropdown">Trạng thái <br> lịch hẹn</div>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Tablet</a></li>
-                                    <li><a class="dropdown-item" href="#">Smartphone</a></li>
-                                </ul>
-                            </th>
+                            <th class="servicessheet-table-col">Thời gian dự kiến <br> hoàn tất</th>
+                            <th class="servicessheet-table-col">Trạng thái <br> lịch hẹn</th>
                         </tr>
                         </thead>
                         <tbody class="table-light">
@@ -93,7 +127,7 @@
         {%endif%}
     </div>
 
-    <div class="col-lg">
+    <div class="col-lg" id="invoice-print">
         {%if id>0%}
         <div class="container position-relative area">
             <div class="position-absolute translate-middle-y fw-bolder title">Hóa đơn</div>
@@ -109,35 +143,35 @@
                         {{service_sheet_detail[0].phieu_dich_vu.dat_lich.khach_hang.ho_ten_user}}
                     </div>
                     <div class="row row-col-2 text">
-                        <div class="col-6">Email:
+                        <div class="col-6 text-break pt-1 gy-1">Email:
                             {{service_sheet_detail[0].phieu_dich_vu.dat_lich.khach_hang.email_user}}
                         </div>
-                        <div class="col-6">Số điện thoại:
+                        <div class="col-6 pt-1 gy-1">Số điện thoại:
                             {{service_sheet_detail[0].phieu_dich_vu.dat_lich.khach_hang.sdt_user}}
                         </div>
-                        <div class="col-6">Lịch hẹn ngày:
+                        <div class="col-6 pt-1 gy-1">Lịch hẹn ngày:
                             {{service_sheet_detail[0].phieu_dich_vu.dat_lich.gio_hen.strftime("%d/%m/%Y")}}
                         </div>
-                        <div class="col-6">lúc:
+                        <div class="col-6 pt-1 gy-1">lúc:
                             {{service_sheet_detail[0].phieu_dich_vu.dat_lich.gio_hen.strftime("%H:%M")}}
                         </div>
-                        <div class="col-6">Thời gian lập hóa đơn:
+                        <div class="col-6 pt-1 gy-1">Thời gian lập hóa đơn:<br>
                             {%if receipt!=None and flag==false%}
                             {{receipt.ngay_tao.strftime("%H:%m -%d/%m/%Y")}}
                             {%endif%}
                         </div>
-                        <div class="col-6">Thời gian thanh toán:
+                        <div class="col-6 pt-1 gy-1">Thời gian thanh toán:<br>
                             {%if receipt!=None and flag==false%}
-                            Chưa có thuộc tính
+                            {{receipt.thoi_gian_thanh_toan.strftime("%H:%m -%d/%m/%Y")}}
                             {%endif%}
                         </div>
                     </div>
                 </div>
-                <div class="table-responsive" style="max-height: 170px; overflow-y: auto; background: white">
+                <div class="table-responsive invoice-table" style="max-height: 170px; overflow-y: auto; background: white">
                     <table class="table table-bordered text">
                         <thead class="table-dark text-center align-middle">
                         <tr>
-                            <th></th>
+                            <th class="sm-service-sheet-table-col"></th>
                             <th class="table-first-col">Dịch vụ</th>
                             <th class="servicessheet-table-col">Giá</th>
                             <th class="servicessheet-table-col">Giảm giá</th>
@@ -146,13 +180,17 @@
                         <tbody class="table-light align-middle">
                         {%for sd in service_sheet_detail%}
                         <tr>
-                            <td>{{loop.index}}</td>
+                            <td class="sm-service-sheet-table-col">{{loop.index}}</td>
                             <td class="table-first-col">{{sd.dich_vu.ten_dich_vu}}</td>
-                            <td class="servicessheet-table-col text-end">{{"{:,.0f}".format(sd.dich_vu.gia_dich_vu)}}
+                            <td class="servicessheet-table-col text-center">{{"{:,.0f}".format(sd.dich_vu.gia_dich_vu)}}
                             </td>
-                            <td class="servicessheet-table-col text-end">
+                            <td class="servicessheet-table-col text-center">
                                 {%if receipt != None and flag==false%}
-                                0
+                                    {%for d in receipt_discount%}
+                                        {%if d.giam_gia.dich_vu.id == sd.dich_vu.id%}
+                                            {{"{:,.0f}".format(d.giam_gia.muc_giam_gia*sd.dich_vu.gia_dich_vu)}}
+                                        {%endif%}
+                                    {%endfor%}
                                 {%else%}
                                 {{"{:,.0f}".format(invoice[id|string][sd.dich_vu.id|string]["gia_dich_vu"]*invoice[id|string][sd.dich_vu.id|string]["muc_giam_gia"])}}
                                 {%if invoice[id|string][sd.dich_vu.id|string]["muc_giam_gia"] != 0 and flag==false%}
@@ -169,24 +207,24 @@
                     </table>
                 </div>
                 <div class="row row-col-2 pt-3 pb-3 text">
-                    <div class="col-6">Tổng giá dịch vụ</div>
-                    <div class="col-6 text-end" id="temporary">
+                    <div class="col-8">Tổng giá dịch vụ</div>
+                    <div class="col-4 text-end" id="temporary">
                         {%if receipt%}
                         {{"{:,.0f}".format(receipt.tong_gia_dich_vu)}}
                         {%else%}
                         {{"{:,.0f}".format(total_tmp["temporary"])}}
                         {%endif%}
                     </div>
-                    <div class="col-6">Tổng giảm giá được áp dụng</div>
-                    <div class="col-6 text-end" id="total_discount">
+                    <div class="col-8">Tổng giảm giá được áp dụng</div>
+                    <div class="col-4 text-end" id="total_discount">
                         {%if receipt%}
-                        {{"{:,.0f}".format(receipt.tong_gia_dich_vu - receipt.tong_thanh_toan)}}
+                        {{"{:,.0f}".format(receipt.tong_giam_gia)}}
                         {%else%}
                         {{"{:,.0f}".format(total_tmp["total_discount"])}}
                         {%endif%}
                     </div>
-                    <div class="col-6">Thuế VAT</div>
-                    <div class="col-6 text-end" id="vat">
+                    <div class="col-8">Thuế VAT</div>
+                    <div class="col-4 text-end" id="vat">
                         {%if receipt%}
                         {{"%.0f"|format(receipt.vat.muc_vat*100)}}&#37;
                         {%else%}
@@ -207,6 +245,7 @@
                 {%if service_sheet_detail[0].phieu_dich_vu.dat_lich.trang_thai_dat_lich.name == "DANG_THUC_HIEN"%}
                 <div class="alert alert-danger text-center" id="alertSelect" style="display:none"></div>
                 <div class="row p-3">
+                    {%if receipt == None%}
                     {% if flag==false%}
                     <div class="col me-3 row">
                         <input class="form-control" id="find_discount" type="text" placeholder="Mã giảm giá"
@@ -218,8 +257,9 @@
                     </div>
                     <a class="col btn btn-dark text fw-bold" href="/invoices/{{id}}/payment">Thanh toán</a>
                     {%else%}
-                    <a class="col btn btn-dark text fw-bold me-5" href="/invoices/{{id}}">Quay lại</a>
-                    <a class="col btn btn-dark text fw-bold ms-5" href="">Hoàn tất thanh toán</a>
+                    <a class="col btn btn-dark text fw-bold me-5 d-flex align-items-center justify-content-center" href="/invoices/{{id}}?page=1">Quay lại</a>
+                    <button class="col btn btn-dark text fw-bold ms-5" onclick="successPaid({{id}})">Hoàn tất thanh toán</button>
+                    {%endif%}
                     {%endif%}
                 </div>
                 {%endif%}

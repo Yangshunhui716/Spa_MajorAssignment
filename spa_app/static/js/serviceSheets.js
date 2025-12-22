@@ -40,7 +40,7 @@ function successUpdateSD(serviceId, appointmentId) {
         }
     }).then(res => res.json()).then(data => {
         if (data.status==200) {
-            window.location.href = "/serviceSheets/" + appointmentId;
+            window.location.href = "/serviceSheets/" + appointmentId +"?page=1";
         }
         else{
             alert(data.err_msg)

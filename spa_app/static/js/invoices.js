@@ -61,7 +61,7 @@ function handlePaidInput(input) {
     let rawValue = input.value.replace(/\D/g, "");
 
     const paidRealInput = document.getElementById("paidReal");
-    const total = Number(document.getElementById("totalReal").value);
+    const total = Math.round(Number(document.getElementById("totalReal").value));
     const resultDisplay = document.getElementById("resultDisplay");
     const btnPay = document.getElementById("btnPay");
 
@@ -73,7 +73,7 @@ function handlePaidInput(input) {
         return;
     }
 
-    let paid = parseInt(rawValue, 10);
+    let paid = Math.round(parseInt(rawValue, 10));
     paidRealInput.value = paid;
 
     input.value = formatVND(paid);
@@ -95,4 +95,66 @@ function handlePaidInput(input) {
 
 function formatVND(number) {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function successPaid(serviceSheetId){
+    let paymentMethod = null;
+    let total = null;
+    let paid = null;
+
+    if (document.querySelector('a.nav-link.active[href="#cash"]')){
+        paymentMethod = 'TIEN_MAT';
+        total = document.getElementById('totalReal').value;
+        paid = document.getElementById('paidReal').value;
+    }
+    else {
+        paymentMethod = 'CHUYEN_KHOAN';
+        total = document.getElementById('totalReal').value;
+        paid = total;
+    }
+
+    if (!paid) {
+        let alert = document.getElementById("alertSelect");
+        alert.innerHTML="<strong>Thông báo!</strong> Chưa nhập số tiền khách đưa";
+        alert.style.display="block";
+        setTimeout(() => {alert.style.display = "none";}, 3000);
+        return;
+    } else if (paid - total < 0){
+        let alert = document.getElementById("alertSelect");
+        alert.innerHTML="<strong>Thông báo!</strong> Số tiền nhận chưa hợp lệ";
+        alert.style.display="block";
+        setTimeout(() => {alert.style.display = "none";}, 3000);
+        return;
+    }
+
+    let temporary = document.getElementById('temporary').innerHTML;
+    temporary = Number(temporary.replace(/,/g, ''));
+
+    let total_discount = document.getElementById('total_discount').innerHTML;
+    total_discount = Number(total_discount.replace(/,/g, ''));
+
+    fetch(`/invoices/${serviceSheetId}/payment/success`,{
+        method: "post",
+        body: JSON.stringify({
+            "phuong_thuc": paymentMethod,
+            "tong_dich_vu": temporary,
+            "tong_giam_gia": total_discount,
+            "tong_thanh_toan": total,
+            "so_tien_nhan": paid,
+        }),
+        headers: {
+            "content-type": "application/json"
+        }
+    }).then(res => res.json()).then(data => {
+        if(data.status===500) {
+            let alert = document.getElementById("alertSelect");
+            alert.innerHTML="<strong>Thông báo!</strong> "+data.err_msg;
+            alert.style.display="block";
+            setTimeout(() => {alert.style.display = "none";}, 3000);
+        }
+        else {
+            window.print();
+            window.location.href = "/invoices/" + serviceSheetId +'?page=1';
+        }
+    });
 }

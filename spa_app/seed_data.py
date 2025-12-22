@@ -510,7 +510,8 @@ def seed_data_ro_rang():
         ma_phieu_dich_vu=phieu_dich_vu_nguyen_van_a.id,
         ma_vat=vat_hien_hanh.id,
         tong_gia_dich_vu=500000,
-        tong_thanh_toan=486000
+        tong_thanh_toan=486000,
+        thoi_gian_thanh_toan=datetime.now()
     )
 
     hoa_don_nguyen_van_hoang = HoaDon(
@@ -518,7 +519,8 @@ def seed_data_ro_rang():
         ma_phieu_dich_vu=phieu_dich_vu_nguyen_van_hoang.id,
         ma_vat=vat_hien_hanh.id,
         tong_gia_dich_vu=500000,
-        tong_thanh_toan=486000
+        tong_thanh_toan=486000,
+        thoi_gian_thanh_toan=datetime.now()
     )
 
     hoa_don_nguyen_van_tien = HoaDon(
@@ -526,7 +528,8 @@ def seed_data_ro_rang():
         ma_phieu_dich_vu=phieu_dich_vu_nguyen_van_tien.id,
         ma_vat=vat_hien_hanh.id,
         tong_gia_dich_vu=500000,
-        tong_thanh_toan=486000
+        tong_thanh_toan=486000,
+        thoi_gian_thanh_toan=datetime.now()
     )
 
     hoa_don_tran_thi_b = HoaDon(
@@ -534,7 +537,8 @@ def seed_data_ro_rang():
         ma_phieu_dich_vu=phieu_dich_vu_tran_thi_b.id,
         ma_vat=vat_hien_hanh.id,
         tong_gia_dich_vu=500000,
-        tong_thanh_toan=486000
+        tong_thanh_toan=486000,
+        thoi_gian_thanh_toan=datetime.now()
     )
 
     db.session.add_all([

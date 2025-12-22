@@ -9,16 +9,57 @@
                 <div class="row pt-1">
                     <div class="col">
                         <input id="search" class="form-control" type="text" placeholder="Search" style="width: 32vw"
-                               onchange="search()" value="{%if kw!=None%}{{kw}}{%endif%}">
+                               onchange="search({%if status!=None%}'{{status}}'{%endif%})"
+                               value="{%if kw!=None%}{{kw}}{%endif%}">
                     </div>
                     <div class="col pt-1">
-                        <ul class="pagination justify-content-end col pagination-sm">
-                            <li class="page-item"><a class="page-link" href="#"><</a></li>
-                            {%for i in range(1, pages+1)%}
-                            <li class="page-item"><a class="page-link" href="/?page={{i}}">{{i}}</a></li>
-                            {%endfor%}
-                            <li class="page-item"><a class="page-link" href="#">></a></li>
-                        </ul>
+                        <nav aria-label="Pagination">
+                            <ul class="pagination pagination-sm justify-content-center">
+                                <li class="page-item {{'disabled' if page <= 1}}">
+                                    <a class="page-link" href="?page={{page-1}}&status={{status}}{%if kw != None%}&search={{kw}}{%endif%}">
+                                        &laquo;
+                                    </a>
+                                </li>
+                                {% if page > 2 %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1&status={{status}}{%if kw != None%}&search={{kw}}{%endif%}">
+                                        1
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% if page > 3 %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">…</span>
+                                </li>
+                                {% endif %}
+                                {% for p in range(page-1, page+2) %}
+                                {% if 1 <= p <= pages %}
+                                <li class="page-item {{'active' if p == page}}">
+                                    <a class="page-link" href="?page={{p}}&status={{status}}{%if kw != None%}&search={{kw}}{%endif%}">
+                                        {{p}}
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% endfor %}
+                                {% if page < pages - 2 %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">…</span>
+                                </li>
+                                {% endif %}
+                                {% if page < pages - 1 %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{pages}}&status={{status}}{%if kw != None%}&search={{kw}}{%endif%}">
+                                        {{pages}}
+                                    </a>
+                                </li>
+                                {% endif %}
+                                <li class="page-item {{'disabled' if page >= pages}}">
+                                    <a class="page-link" href="?page={{page+1}}&status={{status}}{%if kw != None%}&search={{kw}}{%endif%}">
+                                        &raquo;
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -26,13 +67,14 @@
                         <thead class="table-dark text-center align-middle">
                         <tr>
                             <th class="table-first-col">Khách hàng</th>
-                            <th class="service-sheet-table-col">Thời gian dự kiến thực hiện</th>
+                            <th class="service-sheet-table-col">Thời gian dự kiến <br> thực hiện</th>
                             <th class="service-sheet-table-col">
                                 <div class="dropdown-toggle" data-bs-toggle="dropdown">Trạng thái <br> lịch hẹn</div>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Tất cả trạng thái</a></li>
-                                    <li><a class="dropdown-item" href="#">Trạng thái 1</a></li>
-                                    <li><a class="dropdown-item" href="#">Trạng thái 2</a></li>
+                                    <li><div class="dropdown-item" onclick="search('KTV')">Tất cả</div></li>
+                                    <li><div class="dropdown-item" onclick="search('DA_XAC_NHAN')">Đã xác nhận</div></li>
+                                    <li><div class="dropdown-item" onclick="search('DANG_THUC_HIEN')">Đang thực hiện</div></li>
+                                    <li><div class="dropdown-item" onclick="search('DA_HOAN_THANH')">Đã hoàn thành</div></li>
                                 </ul>
                             </th>
                         </tr>
@@ -65,19 +107,19 @@
                     <table class="table table-bordered text">
                         <thead class="table-dark text-center align-middle">
                         <tr>
-                            <th></th>
+                            <th class="sm-service-sheet-table-col"></th>
                             <th class="table-first-col">Dịch vụ</th>
-                            <th class="service-sheet-table-col">Thời lượng dịch vụ</th>
+                            <th class="service-sheet-table-col">Thời lượng<br>dịch vụ</th>
                             <th class="service-sheet-table-col">Giá dịch vụ</th>
                         </tr>
                         </thead>
                         <tbody class="table-light">
                         {%for ad in appointment_details%}
                         <tr>
-                            <td>{{loop.index}}</td>
+                            <td class="sm-service-sheet-table-col">{{loop.index}}</td>
                             <td class="table-first-col">{{ad.dich_vu.ten_dich_vu}}</td>
-                            <td class="service-sheet-table-col">{{ad.dich_vu.thoi_gian_dich_vu}}</td>
-                            <td class="service-sheet-table-col">{{ad.dich_vu.gia_dich_vu}}</td>
+                            <td class="service-sheet-table-col text-center">{{ad.dich_vu.thoi_gian_dich_vu}} phút</td>
+                            <td class="service-sheet-table-col text-center">{{"{:,.0f}".format(ad.dich_vu.gia_dich_vu)}}</td>
                         </tr>
                         {%endfor%}
                         </tbody>
@@ -86,20 +128,19 @@
                 <div class="pt-3 pb-2">
                     <div class="subtitle">Khách hàng: {{appointment_details[0].dat_lich.khach_hang.ho_ten_user}}</div>
                     <div class="row row-col-2 text">
-                        <div class="col-6">Dịch vụ hiện tại:
+                        <div class="col-6 pt-1 gy-1">Dịch vụ hiện tại:
                             {{appointment_details[0].dich_vu.ten_dich_vu}}
                         </div>
-                        <div class="col-6">Kỹ thuật viên: {{appointment_details[0].ky_thuat_vien.user.ho_ten_user}}
+                        <div class="col-6 pt-1 gy-1">Kỹ thuật viên: {{appointment_details[0].ky_thuat_vien.user.ho_ten_user}}
                         </div>
                     </div>
 
                     <div class="row row-col-2 text">
-
                         {%if appointment_details[0 + 1] != null%}
-                        <div class="col-6">Dịch vụ kế tiếp:
+                        <div class="col-6 pt-1 gy-1">Dịch vụ kế tiếp:
                             {{appointment_details[1].dich_vu.ten_dich_vu}}
                         </div>
-                        <div class="col-6">Kỹ thuật viên: {{appointment_details[1].ky_thuat_vien.user.ho_ten_user}}
+                        <div class="col-6 pt-1 gy-1">Kỹ thuật viên: {{appointment_details[1].ky_thuat_vien.user.ho_ten_user}}
                         </div>
                         {%endif%}
                     </div>
@@ -113,19 +154,22 @@
                                value="{%if service_sheet_details != None%}{{service_sheet_details[0].ghi_chu_ktv}}{%endif%}">
                     </div>
                 </div>
-                <div class="container position-relative mt-4" style="background: #B2B2B2" id="replyArea">
+                <div class="container position-relative mt-4 mb-4" style="background: #B2B2B2" id="replyArea">
                     <div class="position-absolute translate-middle-y fw-bolder subtitle">Phản hồi của KH về dịch vụ
                     </div>
                     <div class="pt-3 pb-1">
                         <textarea class="form-control border-0" id="customerReply" style="background: #B2B2B2" readonly>{%if service_sheet_details != None%}{{service_sheet_details[0].phan_hoi_khach_hang}}{%endif%}</textarea>
                     </div>
                 </div>
-                <div class="row pt-4 p-3 " style="display: flex" id="btnUpdate">
+                {%if appointment_details[0].dat_lich.trang_thai_dat_lich.name == 'DANG_THUC_HIEN' or
+                    appointment_details[0].dat_lich.trang_thai_dat_lich.name == 'DA_HOAN_THANH'%}
+                <div class="row pb-3 " style="display: flex" id="btnUpdate">
                     <button class="col btn btn-dark text" onclick="startUpdateSD({{id}})">
                         Cập nhật
                     </button>
                 </div>
-                <div class="row pt-4 p-3" style="display: none" id="btnForUpdate">
+                {%endif%}
+                <div class="row pb-3" style="display: none" id="btnForUpdate">
                     <button class="col btn btn-dark me-5 text" onclick="successUpdateSD({{appointment_details[0].dich_vu.id}}
                     , {{appointment_details[0].dat_lich.id}})">Xác nhận cập nhật
                     </button>

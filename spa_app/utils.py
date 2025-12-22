@@ -1,8 +1,8 @@
-from spa_app.dao import load_vat
+from spa_app.dao import get_vat
 
 def total(invoice):
     temporary, total_discount, total_amount = 0, 0, 0
-    vat = load_vat().muc_vat
+    vat = get_vat()
     service_list = []
 
     if invoice:
@@ -11,12 +11,12 @@ def total(invoice):
         for i in service_list:
             temporary += i["gia_dich_vu"]
             total_discount += (i["gia_dich_vu"]*(i["muc_giam_gia"]))
-        total_amount = (temporary - total_discount)*(1+vat)
+        total_amount = (temporary - total_discount)*(1+(vat.muc_vat))
 
     return {
         "status": 200,
         "temporary": temporary,
         "total_discount": total_discount,
-        "vat": vat,
+        "vat": vat.muc_vat,
         "total_amount": total_amount,
     }

@@ -34,7 +34,10 @@ function successAppointment(appointmentId) {
             location.reload();
         }
         else{
-            alert(data.err_msg)
+            let alert = document.getElementById("alertSelect");
+            alert.innerHTML="<strong>Thông báo!</strong> " + data.err_msg;
+            alert.style.display="block";
+            setTimeout(() => {alert.style.display = "none";}, 3000);
         }
     });
 }
