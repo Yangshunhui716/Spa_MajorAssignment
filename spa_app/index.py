@@ -50,7 +50,6 @@ def register():
 
     return render_template('register.html', err_msg=err_msg)
 
-
 @app.route("/login", methods=["get", "post"])
 @anonymous_required
 def login():
