@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const durationEl = document.getElementById('duration');
   const addBtn = document.getElementById('add-service-btn');
   const overlay = document.getElementById('booking-overlay');
-  const form = document.querySelector(".booking-form");
+  const form = document.querySelector("form"); // lấy form thực sự
   const bookingBtn = document.getElementById('booking-btn');
   const icon = document.getElementById("schedule-icon");
 
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Kiểm tra form khi bấm Đặt lịch
-  bookingBtn.addEventListener('click', () => {
+  bookingBtn.addEventListener('click', (e) => {
     const name = document.getElementById('name').value.trim();
     const date = document.getElementById('date').value.trim();
     const time = document.getElementById('time').value.trim();
@@ -106,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Kiểm tra bắt buộc
     if (!name || !date || !time || !phone || !email) {
+      e.preventDefault(); // chặn submit nếu thiếu dữ liệu
       alert("⚠️ Vui lòng nhập đầy đủ thông tin bắt buộc!");
       return;
     }
@@ -113,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Kiểm tra email hợp lệ
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
+      e.preventDefault();
       alert("⚠️ Email không hợp lệ!");
       return;
     }
@@ -120,38 +122,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // Kiểm tra số điện thoại (chỉ số, tối thiểu 9 ký tự)
     const phoneRegex = /^[0-9]{9,}$/;
     if (!phoneRegex.test(phone)) {
+      e.preventDefault();
       alert("⚠️ Số điện thoại không hợp lệ!");
       return;
     }
 
-    // Nếu hợp lệ → reset form và đóng overlay
-    alert("✅ Đặt lịch thành công!");
-
-    document.getElementById('name').value = "";
-    document.getElementById('date').value = "";
-    document.getElementById('time').value = "";
-    document.getElementById('phone').value = "";
-    document.getElementById('email').value = "";
-    document.getElementById('note').value = "";
-
-    // Reset dịch vụ về mặc định
-    serviceList.innerHTML = `
-      <div class="d-flex align-items-center mb-2 service-item">
-        <select class="form-select service-select">
-          <option value="20">Massage Mặt - 20 phút</option>
-          <option value="30">Điều trị mụn - 30 phút</option>
-          <option value="25">Triệt lông - 25 phút</option>
-        </select>
-        <button type="button" class="remove-btn">×</button>
-      </div>
-    `;
-    updateDuration();
-    updateRemoveButtons();
-
-    overlay.style.display = "none";
+    // Nếu hợp lệ → KHÔNG chặn submit, để form gửi về Flask
+    // Không reset input ở đây
   });
 
   // Khởi tạo
   updateDuration();
   updateRemoveButtons();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const openBtn = document.getElementById('open-booking');
+  const overlay = document.getElementById('booking-overlay');
+  const form = document.querySelector(".booking-form");
+
+  // Mở overlay khi bấm nút
+  openBtn.addEventListener('click', (e) => {
+    e.preventDefault(); // chặn cuộn trang
+    overlay.style.display = "block";
+  });
+
+  // Đóng overlay khi click ngoài form
+  overlay.addEventListener('click', (e) => {
+    if (!form.contains(e.target)) {
+      overlay.style.display = "none";
+    }
+  });
 });

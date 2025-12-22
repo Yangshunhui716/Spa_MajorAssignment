@@ -1,0 +1,118 @@
+{% extends 'layout_index/base_index.html' %}
+
+{% block title %}Dịch vụ{% endblock %}
+
+{% block head %}
+<style>
+    .center-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        /* chiếm toàn bộ chiều cao màn hình */
+        background-color: rgba(0, 0, 0, 0.05);
+        padding-top: 5%;
+    }
+
+    .card {
+        background: rgba(255, 255, 255, 0.95);
+        /* nền trắng */
+        padding: 24px;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 450px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        color: #111;
+
+
+    }
+
+    .field {
+        margin-bottom: 5px;
+        text-align: start;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 4px;
+        color: #111;
+        margin-left:10px;
+
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #374151;
+        background: #f9fafb;
+        color: #111;
+    }
+
+    button {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .btn-primary {
+        background: #06b6d4;
+        color: #fff;
+        width: 100%;
+    }
+
+    .toggle {
+        text-align: center;
+        margin-top: 16px;
+        color: #111;
+    }
+
+    .toggle a {
+        color: #06b6d4;
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="center-container">
+    <div class="card">
+        <h2>Đăng ký</h2>
+        <form action="/login" method="POST">
+            <div class="field">
+                <label for="ho_ten_user">Họ và tên</label>
+                <input name="name" type="text" id="ho_ten_user" required>
+            </div>
+            <div class="field">
+                <label for="sdt_user">Số điện thoại</label>
+                <input name="phone" type="tel" id="sdt_user"
+                       pattern="[0-9]{9,11}"
+                       title="Số điện thoại phải có từ 9 đến 11 chữ số"
+                       required>
+            </div>
+            <div class="field">
+                <label for="email_user">Email</label>
+                <input name="email" type="email" id="email_user" required>
+            </div>
+            <div class="field">
+                <label for="tai_khoan_user">Tài khoản</label>
+                <input name="username" type="text" id="tai_khoan_user" required>
+            </div>
+            <div class="field">
+                <label for="password_user">Mật khẩu</label>
+                <input name="password" type="password" id="password_user" required>
+            </div>
+            <div class="field">
+                <label for="confirm_password_user">Nhập Lại Mật khẩu</label>
+                <input name="confirm_password" type="password" id="confirm_password_user" required>
+            </div>
+            <button class="btn-danger" type="submit">Đăng ký</button>
+        </form>
+        <div class="toggle">
+            Đã có tài khoản? <a href="{{ url_for('login') }}">Đăng nhập</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -168,35 +168,30 @@ def seed_data_ro_rang():
     ky_thuat_vien_massage_1 = KyThuatVien(
         ma_ktv=user_ktv_massage_tran_gia_huy.id,
         so_luong_khach=4,
-        trang_thai=TrangThaiKTV.RANH,
         dich_vu_chuyen_mon=dich_vu_massage_body.id
     )
 
     ky_thuat_vien_massage_2 = KyThuatVien(
         ma_ktv=user_ktv_massage_nguyen_quoc_huy.id,
         so_luong_khach=4,
-        trang_thai=TrangThaiKTV.RANH,
         dich_vu_chuyen_mon=dich_vu_massage_body.id
     )
 
     ky_thuat_vien_cham_soc_da_1 = KyThuatVien(
         ma_ktv=user_ktv_cham_soc_da_le_quang_an.id,
         so_luong_khach=2,
-        trang_thai=TrangThaiKTV.DANG_PHUC_VU,
         dich_vu_chuyen_mon=dich_vu_cham_soc_da.id
     )
 
     ky_thuat_vien_cham_soc_da_2 = KyThuatVien(
         ma_ktv=user_ktv_cham_soc_da_nguyen_minh_anh.id,
         so_luong_khach=2,
-        trang_thai=TrangThaiKTV.DANG_PHUC_VU,
         dich_vu_chuyen_mon=dich_vu_cham_soc_da.id
     )
 
     ky_thuat_vien_goi_dau_1 = KyThuatVien(
         ma_ktv=user_ktv_goi_dau_tran_cuc.id,
         so_luong_khach=2,
-        trang_thai=TrangThaiKTV.DANG_PHUC_VU,
         dich_vu_chuyen_mon=dich_vu_goi_dau.id
     )
 
@@ -514,7 +509,6 @@ def seed_data_ro_rang():
         ma_thu_ngan = thu_ngan_pham_van_d.id,
         ma_phieu_dich_vu=phieu_dich_vu_nguyen_van_a.id,
         ma_vat=vat_hien_hanh.id,
-        ma_giam_gia=ma_giam_gia_spa_massage.id,
         tong_gia_dich_vu=500000,
         tong_thanh_toan=486000
     )
@@ -523,7 +517,6 @@ def seed_data_ro_rang():
         ma_thu_ngan=thu_ngan_pham_van_d.id,
         ma_phieu_dich_vu=phieu_dich_vu_nguyen_van_hoang.id,
         ma_vat=vat_hien_hanh.id,
-        ma_giam_gia=ma_giam_gia_spa_goi_dau.id,
         tong_gia_dich_vu=500000,
         tong_thanh_toan=486000
     )
@@ -532,7 +525,6 @@ def seed_data_ro_rang():
         ma_thu_ngan=thu_ngan_pham_van_d.id,
         ma_phieu_dich_vu=phieu_dich_vu_nguyen_van_tien.id,
         ma_vat=vat_hien_hanh.id,
-        ma_giam_gia=ma_giam_gia_spa_cham_soc_da.id,
         tong_gia_dich_vu=500000,
         tong_thanh_toan=486000
     )
@@ -541,7 +533,6 @@ def seed_data_ro_rang():
         ma_thu_ngan=thu_ngan_pham_van_d.id,
         ma_phieu_dich_vu=phieu_dich_vu_tran_thi_b.id,
         ma_vat=vat_hien_hanh.id,
-        ma_giam_gia=ma_giam_gia_spa_massage.id,
         tong_gia_dich_vu=500000,
         tong_thanh_toan=486000
     )

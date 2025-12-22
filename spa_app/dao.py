@@ -2,8 +2,22 @@ import json
 from datetime import datetime
 from spa_app import app, db
 from spa_app.models import KyThuatVien, DichVu, DatLich, PhieuDichVu, HoaDon, DatLichDetail, PhieuDichVuDetail, \
-    MaGiamGia, VAT, KhachHangMaGiamGia
+    MaGiamGia, VAT, KhachHangMaGiamGia, User
+import hashlib
 
+
+def auth_user(username,password):
+    password = hashlib.md5(password.encode("utf-8")).hexdigest()
+    return User.query.filter(User.username.__eq__(username), User.password.__eq__(password)).first()
+
+def add_user(name, username,password,avatar):
+    password = hashlib.md5(password.encode('utf-8')).hexdigest()
+    u = User(name=name, username=username,password=password, avatar=avatar)
+    db.session.add(u)
+    db.session.commit()
+
+def get_user_by_id(user_id):
+    return User.query.get(user_id)
 
 def load_therapists():
     return KyThuatVien.query.all()
