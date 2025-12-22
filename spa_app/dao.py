@@ -1,10 +1,24 @@
-import json
+import hashlib
 from datetime import datetime, time, timedelta
 from sqlalchemy import case, cast, Date
 from spa_app import app, db
 from spa_app.models import KyThuatVien, DichVu, DatLich, PhieuDichVu, HoaDon, DatLichDetail, PhieuDichVuDetail, \
     MaGiamGia, VAT, KhachHangMaGiamGia, User, ThoiGianBieuKTV, ThoiGianKTVBan, HoaDonMaGiamGia, TrangThaiDatLich, \
     TrangThaiMaGiamGiaEnum
+
+
+def auth_user(username,password):
+    password = hashlib.md5(password.encode("utf-8")).hexdigest()
+    return User.query.filter(User.ho_ten_user.__eq__(username), User.password_user.__eq__(password)).first()
+
+def add_user(name, username,password,avatar, email, phone):
+    password = hashlib.md5(password.encode('utf-8')).hexdigest()
+    u = User(ho_ten_user = name , password_user = password, sdt_user = phone, email_user = email,tai_khoan_user = username)
+    db.session.add(u)
+    db.session.commit()
+
+def get_user_by_id(user_id):
+    return User.query.get(user_id)
 
 
 def load_therapists(therapist_id):

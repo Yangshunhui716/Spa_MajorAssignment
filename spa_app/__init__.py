@@ -14,5 +14,6 @@ cloudinary.config(
   	api_key = "143511745215512",
   	api_secret = "f35MCfbdfoIhB8Z6XSrQVTmGQBA"
 )
-
 db = SQLAlchemy(app)
+
+login_manager = LoginManager(app)

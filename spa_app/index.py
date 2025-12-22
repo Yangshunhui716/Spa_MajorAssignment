@@ -1,23 +1,140 @@
 import math
 from flask import render_template, request, redirect, session, jsonify
-from spa_app import app, utils
+from flask_login import login_user, logout_user
+from spa_app import db, app, utils, login_manager
 from spa_app.dao import load_appointments, get_appointment_details, change_appointment_status, \
     assign_therapists, update_sheet_detail, check_discount, load_service_sheets, get_service_sheet_details, \
     count_appointments, count_service_sheets, get_free_therapists_list, add_busy_time, assign_receptionist, \
-    get_appointment_status, get_receipt, del_busy_time, get_vat, add_receipt, get_receipt_discount
-from spa_app.models import HoaDon, TrangThaiDatLich
+    get_appointment_status, get_receipt, del_busy_time, add_receipt, get_receipt_discount, auth_user, \
+    add_user
+from spa_app.models import DatLich, DatLichDetail, PhieuDichVu, PhieuDichVuDetail, HoaDon, TrangThaiDatLich, UserRole, \
+    User
+from decorators import anonymous_required
+import dao
+from datetime import datetime
+import cloudinary.uploader
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
+
+@app.route('/register', methods=['get', 'post'])
+def register():
+    err_msg = None
+    if request.method.__eq__("POST"):
+
+        password = request.form.get("password")
+        confirm = request.form.get('confirm')
+
+        if password.__eq__(confirm):
+            name = request.form.get("name")
+            username = request.form.get("username")
+            email = request.form.get("email")
+            phone = request.form.get("phone")
+            file = request.files.get('avatar')
+
+            file_path = None
+
+            if file:
+                res = cloudinary.uploader.upload(file)
+                file_path = res['secure_url']
+            try:
+                dao.add_user(name=name,username=username,password=password,email = email, phone = phone, avatar=file_path)
+                return redirect('/login')
+            except:
+                db.session.rollback()
+                err_msg = "Hệ thống đang bị lỗi! Vui lòng quay lại sau!"
+        else:
+            err_msg = "Mật khẩu không khớp!"
+
+    return render_template('register.html', err_msg=err_msg)
+
+@app.route("/login", methods=["GET", "POST"])
+@anonymous_required
+def login():
+    err_msg = None
+    if request.method.__eq__("POST"):
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        user = dao.auth_user(username, password)
+
+        if user:
+            login_user(user)
+            next = request.args.get("next")
+            return redirect(next if next else "/")
+        else:
+            err_msg = "Tài khoản hoặc mật khẩu không đúng!"
+
+    return render_template("login.html", err_msg=err_msg)
+
+@app.route("/logout")
+def logout_my_user():
+    logout_user()
+    return redirect("/login")
+
+@login_manager.user_loader
+def get_user(user_id):
+    return dao.get_user_by_id(user_id=user_id)
+
+
 @app.route('/services')
 def index_services():
     return render_template('index_services.html')
 
-@app.route('/booking')
+
+@app.route('/booking', methods=["GET", "POST"])
 def booking():
-    return render_template('booking.html')
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
+        phone = request.form.get("phone")
+        date_str = request.form.get("date")
+        time_str = request.form.get("time")
+
+        print("Form nhận được:", request.form)
+        print("date_str:", date_str)
+        print("time_str:", time_str)
+
+        datetime_str = f"{date_str} {time_str}:00"
+
+        try:
+            gio_hen = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S")
+        except ValueError as e:
+            print("Lỗi parse:", e)
+            return render_template("booking.html", message="Định dạng ngày/giờ không hợp lệ!")
+
+        note = request.form.get("note")
+
+        user = User.query.filter_by(sdt_user=phone).first()
+        if not user:
+            user = User(
+                ho_ten_user=name,
+                sdt_user=phone,
+                email_user=email,
+                role_user=UserRole.KHACH_HANG
+            )
+            db.session.add(user)
+            db.session.commit()
+        else:
+            user.ho_ten_user = name
+            user.email_user = email
+
+            db.session.commit()
+
+        # Tạo lịch hẹn
+        dat_lich = DatLich(
+            ma_khach_hang=user.id,
+            gio_hen=gio_hen,
+            ghi_chu=note
+        )
+        db.session.add(dat_lich)
+        db.session.commit()
+
+        return render_template("index.html", message="Đặt lịch thành công!")
+
+    return render_template("index.html")
 
 @app.route('/appointments/<int:id>')
 def appointment(id):

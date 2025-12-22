@@ -13,11 +13,9 @@
                 <a class="nav-link text-white {% if request.endpoint == 'contact' %}active{% endif %}"
                    href="#footer-main">LIÊN HỆ</a>
             </div>
-
-
             <!-- Sign In bên phải -->
             <div>
-                <a class="nav-link text-white" href="#">SIGN IN</a>
+                <a class="nav-link text-white" href="{{ url_for('login') }}">SIGN IN</a>
             </div>
         </nav>
 
