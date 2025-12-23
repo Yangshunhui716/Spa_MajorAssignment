@@ -245,22 +245,20 @@
                 {%if service_sheet_detail[0].phieu_dich_vu.dat_lich.trang_thai_dat_lich.name == "DANG_THUC_HIEN"%}
                 <div class="alert alert-danger text-center" id="alertSelect" style="display:none"></div>
                 <div class="row p-3">
-                    {%if receipt == None%}
-                    {% if flag==false%}
-                    <div class="col me-3 row">
-                        <input class="form-control" id="find_discount" type="text" placeholder="Mã giảm giá"
-                               style="width: 15vw">
-                        <button class="btn btn-dark btn-sm text col" style="width: 30px"
-                                onclick="findDiscount({{id}},{{service_sheet_detail[0].phieu_dich_vu.dat_lich.khach_hang.id}})">
-                            Tìm
-                        </button>
-                    </div>
-                    <a class="col btn btn-dark text fw-bold" href="/invoices/{{id}}/payment">Thanh toán</a>
-                    {%else%}
-                    <a class="col btn btn-dark text fw-bold me-5 d-flex align-items-center justify-content-center" href="/invoices/{{id}}?page=1">Quay lại</a>
-                    <button class="col btn btn-dark text fw-bold ms-5" onclick="successPaid({{id}})">Hoàn tất thanh toán</button>
-                    {%endif%}
-                    {%endif%}
+                        {% if flag==false%}
+                        <div class="col me-3 row">
+                            <input class="form-control" id="find_discount" type="text" placeholder="Mã giảm giá"
+                                   style="width: 15vw">
+                            <button class="btn btn-dark btn-sm text col" style="width: 30px"
+                                    onclick="findDiscount({{id}},{{service_sheet_detail[0].phieu_dich_vu.dat_lich.khach_hang.id}})">
+                                Tìm
+                            </button>
+                        </div>
+                        <a class="col btn btn-dark text fw-bold" href="/invoices/{{id}}/payment">Thanh toán</a>
+                        {%else%}
+                        <a class="col btn btn-dark text fw-bold me-5 d-flex align-items-center justify-content-center no-print" href="/invoices/{{id}}?page=1">Quay lại</a>
+                        <button class="col btn btn-dark text fw-bold ms-5 no-print" onclick="successPaid({{id}})">Hoàn tất thanh toán</button>
+                        {%endif%}
                 </div>
                 {%endif%}
             </div>
