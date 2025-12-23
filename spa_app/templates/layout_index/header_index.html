@@ -14,9 +14,20 @@
                    href="#footer-main">LIÊN HỆ</a>
             </div>
             <!-- Sign In bên phải -->
+            {% if current_user.is_authenticated%}
+            <div>
+                <a class="nav-link text-white" href="{{ url_for('index') }}">Chào {{ current_user.ho_ten_user }}</a>
+            </div>
+             <div>
+                <a class="nav-link text-white" href="{{ url_for('logout_my_user') }}">Đăng Xuất</a>
+            </div>
+
+            {%else%}
             <div>
                 <a class="nav-link text-white" href="{{ url_for('login') }}">SIGN IN</a>
             </div>
+            {%endif%}
+
         </nav>
 
 

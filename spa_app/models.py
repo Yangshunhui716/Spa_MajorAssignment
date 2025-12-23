@@ -48,11 +48,11 @@ class BaseModel(db.Model):
     ngay_tao = Column(DateTime, nullable=False, default=datetime.now)
 
 
-class User(BaseModel, UserMixin):
+class User(UserMixin, BaseModel ):
     ho_ten_user = Column(String(150), nullable=False)
     sdt_user = Column(Integer, nullable=False, unique=True)
     email_user = Column(String(150), nullable=False)
-    tai_khoan_user = Column(String(50))
+    tai_khoan_user = Column(String(50), unique=True)
     password_user = Column(String(50))
     role_user = Column(Enum(UserRole), nullable=False, default=UserRole.USER)
 

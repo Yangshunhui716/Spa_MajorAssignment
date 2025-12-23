@@ -7,9 +7,21 @@ from spa_app.models import KyThuatVien, DichVu, DatLich, PhieuDichVu, HoaDon, Da
     TrangThaiMaGiamGiaEnum
 
 
-def auth_user(username,password):
+def auth_user(username, password):
+    print("LOGIN TRY:")
+    print(" - username:", repr(username))
+    print(" - raw password:", repr(password))
+
     password = hashlib.md5(password.encode("utf-8")).hexdigest()
-    return User.query.filter(User.ho_ten_user.__eq__(username), User.password_user.__eq__(password)).first()
+    print(" - hashed:", password)
+
+    user = User.query.filter(
+        User.tai_khoan_user == username,
+        User.password_user == password
+    ).first()
+
+    print(" - user found:", user)
+    return user
 
 def add_user(name, username,password,avatar, email, phone):
     password = hashlib.md5(password.encode('utf-8')).hexdigest()
@@ -20,6 +32,10 @@ def add_user(name, username,password,avatar, email, phone):
 def get_user_by_id(user_id):
     return User.query.get(user_id)
 
+def is_ky_thuat_vien(user_id):
+    return db.session.query(KyThuatVien)\
+        .filter(KyThuatVien.ma_ktv == user_id)\
+        .first()
 
 def load_therapists(therapist_id):
     if therapist_id:
