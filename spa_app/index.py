@@ -8,7 +8,7 @@ from spa_app.dao import load_appointments, get_appointment_details, change_appoi
     get_appointment_status, get_receipt, del_busy_time, add_receipt, get_receipt_discount, auth_user, \
     add_user, get_user_by_id, is_ky_thuat_vien
 from spa_app.models import DatLich, TrangThaiDatLich, UserRole, User
-from decorators import anonymous_required
+from spa_app.decorators import anonymous_required
 from datetime import datetime
 import cloudinary.uploader
 
@@ -69,12 +69,11 @@ def login():
             print(" - username:", user.tai_khoan_user)
             print(" - role:", user.role_user)
 
-            ktv = is_ky_thuat_vien(user.id)
-            if ktv:
-                return redirect((url_for("service_sheet", id = 0, page=1)))
-
             if role == UserRole.USER:
                 return redirect((url_for("index")))
+
+            if role == UserRole.KY_THUAT_VIEN:
+                return redirect((url_for("service_sheet", id = 0, page=1)))
 
             if role == UserRole.LE_TAN:
                 return redirect((url_for("appointment", id = 0, page=1)))
@@ -213,6 +212,8 @@ def appointment(id):
 
 @app.route('/appointments/<int:id>/success', methods=['POST'])
 def success_appointment(id):
+    if current_user.role_user != UserRole.LE_TAN:
+        return redirect('/')
     data = request.get_json()
 
     if not data or 'selectedTherapists' not in data:
@@ -235,30 +236,37 @@ def success_appointment(id):
 
 @app.route('/appointments/<int:id>/carryOut')
 def carry_out_appointment(id):
+    if current_user.role_user != UserRole.LE_TAN:
+        return redirect('/')
     change_appointment_status(appointment_id=id, status=TrangThaiDatLich.DANG_THUC_HIEN)
     return redirect('/appointments/0?status=LE_TAN&page=1')
 
 
 @app.route('/appointments/<int:id>/cancel')
 def cancel_appointment(id):
+    if current_user.role_user != UserRole.LE_TAN:
+        return redirect('/')
     del_busy_time(appointment_id=id)
     change_appointment_status(appointment_id=id, status=TrangThaiDatLich.DA_HUY)
     return redirect('/appointments/' + str(id) + '?status=LE_TAN&page=1')
 
 
 @app.route('/serviceSheets/<int:id>')
+@login_required
 def service_sheet(id):
+    if current_user.role_user != UserRole.KY_THUAT_VIEN:
+        return redirect('/')
     kw = request.args.get("search")
     status = request.args.get("status")
     hind = False
+    appointment_details = get_appointment_details(therapist_id=current_user.id)
     if status == None:
         status = 'KTV'
     elif status == 'DA_XAC_NHAN':
         hind = True
     page = int(request.args.get("page", id))
-    pages = math.ceil(count_appointments(status=status, kw=kw, hind=hind) / app.config["PAGE_SIZE"])
-    appointments = load_appointments(status=status, kw=kw, page=page, hind=hind)
-    appointment_details = None
+    pages = math.ceil(count_appointments(status=status, kw=kw, hind=hind, appointment_details=appointment_details) / app.config["PAGE_SIZE"])
+    appointments = load_appointments(status=status, kw=kw, page=page, hind=hind, appointment_details=appointment_details)
     service_sheet_details = None
     if id > 0:
         if load_service_sheets(appointment_id=id):
@@ -273,17 +281,20 @@ def service_sheet(id):
 
 @app.route('/serviceSheets/update/<int:id>')
 def update_service_sheet(id):
+    if current_user.role_user != UserRole.KY_THUAT_VIEN:
+        return redirect('/')
     flag = True
     hind = False
     kw = request.args.get("search")
     status = request.args.get("status")
+    appointment_details = get_appointment_details(therapist_id=current_user.id)
     if status == None:
         status = 'KTV'
     elif status == 'DA_XAC_NHAN':
         hind = True
     page = int(request.args.get("page", id))
-    pages = math.ceil(count_appointments(status=status, kw=kw, hind=hind) / app.config["PAGE_SIZE"])
-    appointments = load_appointments(status=status, kw=kw, page=page, hind=hind)
+    pages = math.ceil(count_appointments(status=status, kw=kw, hind=hind, appointment_details=appointment_details) / app.config["PAGE_SIZE"])
+    appointments = load_appointments(status=status, kw=kw, page=page, hind=hind, appointment_details=appointment_details)
     appointment_details = get_appointment_details(appointment_id=id)
     service_sheet_details = None
     if load_service_sheets(appointment_id=id):
@@ -297,6 +308,8 @@ def update_service_sheet(id):
 
 @app.route('/serviceSheets/update/<int:id>/success', methods=['POST'])
 def success_service_sheet(id):
+    if current_user.role_user != UserRole.KY_THUAT_VIEN:
+        return redirect('/')
     data = request.get_json()
     if not data:
         return jsonify({"status": 400, "err_msg": "Dữ liệu không tồn tại"})
@@ -310,6 +323,8 @@ def success_service_sheet(id):
 
 @app.route('/invoices/<int:id>')
 def invoice(id):
+    if current_user.role_user != UserRole.THU_NGAN:
+        return redirect('/')
     flag = False
     kw = request.args.get("search")
     page = int(request.args.get("page", id))
@@ -355,6 +370,8 @@ def invoice(id):
 
 @app.route('/invoices/<int:id>/add_discount', methods=['PUT'])
 def add_discount(id):
+    if current_user.role_user != UserRole.THU_NGAN:
+        return redirect('/')
     discount = check_discount(request.json.get("ma_giam_gia"), request.json.get("ma_khach_hang"))
     if discount == -1:
         return jsonify({"status": 400, "err_msg": "Mã giảm giá không hợp lệ"})
@@ -378,6 +395,8 @@ def add_discount(id):
 
 @app.route('/invoices/<int:id>/remove_discount', methods=['PUT'])
 def remove_discount(id):
+    if current_user.role_user != UserRole.THU_NGAN:
+        return redirect('/')
     invoice = session.get('invoice', {})
     service_id = request.json.get("ma_dich_vu")
 
@@ -396,6 +415,8 @@ def remove_discount(id):
 
 @app.route('/invoices/<int:id>/payment')
 def payment(id):
+    if current_user.role_user != UserRole.THU_NGAN:
+        return redirect('/')
     flag = True
     service_sheet_detail = get_service_sheet_details(service_sheet_id=id)
     invoice = session.get('invoice', {})
@@ -408,6 +429,8 @@ def payment(id):
 
 @app.route('/invoices/<int:id>/payment/success', methods=['POST'])
 def success_pay(id):
+    if current_user.role_user != UserRole.THU_NGAN:
+        return redirect('/')
     invoice = session.get('invoice', {})
     payment_method = request.json.get("phuong_thuc")
     temporary = request.json.get("tong_dich_vu")

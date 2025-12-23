@@ -1,5 +1,6 @@
 from spa_app.dao import get_vat
 
+
 def total(invoice):
     temporary, total_discount, total_amount = 0, 0, 0
     vat = get_vat()

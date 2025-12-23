@@ -79,6 +79,7 @@
                             </th>
                         </tr>
                         </thead>
+                        {%if appointments%}
                         <tbody class="table-light">
                         {%for a in appointments%}
                         <tr onclick="displaySheetDetail({{a.id}})">
@@ -88,6 +89,7 @@
                         </tr>
                         {%endfor%}
                         </tbody>
+                        {%endif%}
                     </table>
                 </div>
             </div>

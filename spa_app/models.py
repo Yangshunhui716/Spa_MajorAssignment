@@ -12,6 +12,7 @@ class UserRole(RoleEnum):
     THU_NGAN = "Thu_Ngan"
     QUAN_LY = "Quan_Ly"
     QUAN_TRI_VIEN = "Quan_Tri_Vien"
+    KY_THUAT_VIEN = "Ky_Thuat_Vien"
 
 
 class TrangThaiDatLich(RoleEnum):

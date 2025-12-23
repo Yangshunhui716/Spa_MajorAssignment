@@ -12,7 +12,6 @@ def auth_user(username, password):
     print(" - username:", repr(username))
     print(" - raw password:", repr(password))
 
-    password = hashlib.md5(password.encode("utf-8")).hexdigest()
     print(" - hashed:", password)
 
     user = User.query.filter(
@@ -24,7 +23,6 @@ def auth_user(username, password):
     return user
 
 def add_user(name, username,password,avatar, email, phone):
-    password = hashlib.md5(password.encode('utf-8')).hexdigest()
     u = User(ho_ten_user = name , password_user = password, sdt_user = phone, email_user = email,tai_khoan_user = username)
     db.session.add(u)
     db.session.commit()
@@ -107,13 +105,21 @@ def load_services():
     return DichVu.query.all()
 
 
-def load_appointments(appointment_id=None, status=None, kw=None, page=None, hind=False):
+def load_appointments(appointment_id=None, status=None, kw=None, page=None, hind=False, appointment_details=None):
     query = DatLich.query
+    if appointment_details:
+        appointment_id = []
+        for a in appointment_details:
+            appointment_id.append(a.ma_dat_lich)
+        query = query.filter(DatLich.id.in_(appointment_id))
+    else:
+        return
+
     if kw:
         query = query.filter(DatLich.khach_hang.has(User.ho_ten_user.ilike(f"%{kw}%")))
 
     if appointment_id:
-        return query.get(appointment_id)
+        return query.filter(DatLich.id.in_(appointment_id)).all()
 
     match status:
         case "CHO_XAC_NHAN":
@@ -168,8 +174,16 @@ def load_appointments(appointment_id=None, status=None, kw=None, page=None, hind
     return query.all()
 
 
-def count_appointments(status=None, kw=None, hind=False):
+def count_appointments(status=None, kw=None, hind=False, appointment_details=None):
     query = DatLich.query
+    if appointment_details:
+        appointment_id = []
+        for a in appointment_details:
+            appointment_id.append(a.ma_dat_lich)
+        query = query.filter(DatLich.id.in_(appointment_id))
+    else:
+        return 1
+
     if kw:
         query = query.filter(DatLich.khach_hang.has(User.ho_ten_user.ilike(f"%{kw}%")))
 
@@ -205,8 +219,13 @@ def count_appointments(status=None, kw=None, hind=False):
     return query.count()
 
 
-def get_appointment_details(appointment_id):
-    return DatLichDetail.query.filter(DatLichDetail.ma_dat_lich == appointment_id).all()
+def get_appointment_details(appointment_id=None, therapist_id=None):
+    query = DatLichDetail.query
+    if appointment_id:
+        query = query.filter(DatLichDetail.ma_dat_lich == appointment_id)
+    if therapist_id:
+        query = query.filter(DatLichDetail.ma_ky_thuat_vien == therapist_id)
+    return query.all()
 
 
 def get_appointment_status(appointment_id):
@@ -228,7 +247,7 @@ def assign_receptionist(appointment_id, receptionist_id):
 
 
 def assign_therapists(appointment_id, selected_therapists):
-    details = get_appointment_details(appointment_id)
+    details = get_appointment_details(appointment_id=appointment_id)
     if len(details) != len(selected_therapists):
         return -1
     for detail, th in zip(details, selected_therapists):
@@ -259,7 +278,7 @@ def load_service_sheets(appointment_id=None, sheet_id=None, kw=None, page=None, 
     query = PhieuDichVu.query.join(DatLich)
 
     if kw:
-        query = query.join(User).filter(User.ho_ten_user.ilike(f"%{kw}%"))
+        query = query.filer(DatLich.khach_hang.has(User.ho_ten_user.ilike(f"%{kw}%")))
 
     if appointment_id:
         return query.filter(PhieuDichVu.ma_dat_lich == appointment_id).first()
@@ -288,7 +307,7 @@ def count_service_sheets(kw=None, flag=True):
     query = PhieuDichVu.query.join(DatLich)
 
     if kw:
-        query = query.join(User).filter(User.ho_ten_user.ilike(f"%{kw}%"))
+        query = query.filer(DatLich.khach_hang.has(User.ho_ten_user.ilike(f"%{kw}%")))
 
     if flag is False:
         query = (query.filter(DatLich.trang_thai_dat_lich.in_([
@@ -313,7 +332,7 @@ def update_sheet_detail(appointment_id, update_content):
         db.session.add(service_sheet)
         db.session.commit()
 
-        for detail in get_appointment_details(appointment_id):
+        for detail in get_appointment_details(appointment_id=appointment_id):
             if (detail.ma_dich_vu == update_content["ma_dich_vu"]):
                 sheet_detail = PhieuDichVuDetail(ma_phieu_dich_vu=service_sheet.id,
                                                  ma_dich_vu=update_content["ma_dich_vu"]
