@@ -72,6 +72,9 @@ class User(UserMixin, BaseModel ):
         lazy=True
     )
 
+    def __str__(self):
+        return self.ho_ten_user
+
 class DichVu(BaseModel):
     ten_dich_vu = Column(String(150), nullable=False, unique=True)
     mo_ta = Column(String(150))
@@ -85,6 +88,9 @@ class DichVu(BaseModel):
     ma_giam_gia = relationship("MaGiamGia", backref="dich_vu", lazy=True)
     ky_thuat_vien = relationship("KyThuatVien", backref="dich_vu", lazy=True)
 
+    def __str__(self):
+        return self.ten_dich_vu
+
 class KyThuatVien(db.Model):
     ma_ktv = Column(Integer, ForeignKey(User.id, ondelete='CASCADE'), primary_key=True, nullable=False)
     so_luong_khach = Column(Integer, nullable=False, default=0)
@@ -92,6 +98,7 @@ class KyThuatVien(db.Model):
 
     dat_lich_detail = relationship("DatLichDetail", backref="ky_thuat_vien", lazy=True)
     thoi_gian_bieu = relationship("ThoiGianBieuKTV", backref="ky_thuat_vien", lazy=True)
+
 
 class DatLich(BaseModel):
     trang_thai_dat_lich = Column(Enum(TrangThaiDatLich), nullable=False, default=TrangThaiDatLich.CHO_XAC_NHAN)

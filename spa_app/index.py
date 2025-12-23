@@ -82,25 +82,6 @@ def login():
             if role == UserRole.THU_NGAN:
                 return redirect((url_for("invoice", id = 0, page=1)))
 
-            # if role == UserRole.QUAN_LY:
-            #     return redirect((url_for("appointment", id)))
-            #
-            # if role == UserRole.QUAN_TRI_VIEN:
-            #     return redirect((url_for("appointment", id)))
-
-            # if role == UserRole.USER:
-            #     return redirect((url_for("index")))
-            #
-            # if role == UserRole.USER:
-            #     return redirect((url_for("index")))
-            #
-            # if role == UserRole.USER:
-            #     return redirect((url_for("index")))
-            # print("TEST MIXIN:")
-            # print("type(user):", type(user))
-            # print("has get_id:", hasattr(user, "get_id"))
-            # print("get_id():", user.get_id())
-            # print("is_authenticated:", user.is_authenticated)
             next = request.args.get("next")
             return redirect(next if next else "/")
         else:
@@ -118,6 +99,20 @@ def logout_my_user():
 @login_manager.user_loader
 def get_user(user_id):
     return get_user_by_id(user_id=user_id)
+
+
+@app.route("/admin-login", methods=["POST"])
+def admin_login_process():
+    username = request.form.get("username")
+    password = request.form.get("password")
+
+    user = auth_user(username, password)
+
+    if user:
+        login_user(user)
+        return redirect("/admin")
+    else:
+        err_msg = "Tài khoản hoặc mật khẩu không đúng!"
 
 
 @app.route('/services')
