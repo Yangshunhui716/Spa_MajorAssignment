@@ -118,7 +118,7 @@ def seed_data_ro_rang():
         ho_ten_user="Trần Cúc",
         sdt_user=906660666,
         email_user="ktv_da2@gmail.com",
-        tai_khoan_user="ktv_da2",
+        tai_khoan_user="ktv_goi_dau_11",
         password_user="123456",
         role_user=UserRole.USER
     )

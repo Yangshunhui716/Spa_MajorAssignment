@@ -16,7 +16,8 @@
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label>Họ tên</label>
-                                    <input name="name" id="name" type="text" class="form-control"/>
+                                    <input name="name" id="name" type="text" class="form-control"
+                                    value="{{ current_user.ho_ten_user if current_user.is_authenticated else '' }}"/>
                                 </div>
                                 <div class="col-md-4">
                                     <label>Ngày đặt lịch</label>
@@ -30,15 +31,19 @@
                         </div>
                         <div class="form-block">
                             <label>Số điện thoại</label>
-                            <input name="phone" id="phone" type="tel" class="form-control"/>
+                            <input name="phone" id="phone" type="tel" class="form-control"
+                             value="{{ current_user.sdt_user if current_user.is_authenticated else '' }}"/>
                         </div>
                         <div class="form-block">
                             <label>Email</label>
-                            <input name="email" id="email" type="email" class="form-control"/>
+                            <input name="email" id="email" type="email" class="form-control"
+                             value="{{ current_user.email_user if current_user.is_authenticated else '' }}"/>
                         </div>
                         <div class="form-block flex-grow-1">
                             <label>Ghi chú</label>
-                            <textarea name="note" id="note" class="form-control" rows="6"></textarea>
+                            <textarea name="note" id="note" class="form-control" rows="6">
+                                {{ last_booking.ghi_chu if last_booking else 'chưa có ghi chú' }}
+                            </textarea>
                         </div>
                     </div>
                     <!-- Cột phải -->
