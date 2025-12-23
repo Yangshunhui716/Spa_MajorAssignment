@@ -1,16 +1,14 @@
 import math
 from flask import render_template, request, redirect, session, jsonify, url_for
-from flask_login import login_user, logout_user, current_user
-from spa_app import db, app, utils, login_manager
+from flask_login import login_user, logout_user, current_user, login_required
+from spa_app import db, app, utils, login_manager, admin
 from spa_app.dao import load_appointments, get_appointment_details, change_appointment_status, \
     assign_therapists, update_sheet_detail, check_discount, load_service_sheets, get_service_sheet_details, \
     count_appointments, count_service_sheets, get_free_therapists_list, add_busy_time, assign_receptionist, \
     get_appointment_status, get_receipt, del_busy_time, add_receipt, get_receipt_discount, auth_user, \
-    add_user
-from spa_app.models import DatLich, DatLichDetail, PhieuDichVu, PhieuDichVuDetail, HoaDon, TrangThaiDatLich, UserRole, \
-    User
+    add_user, get_user_by_id, is_ky_thuat_vien
+from spa_app.models import DatLich, TrangThaiDatLich, UserRole, User
 from decorators import anonymous_required
-import dao
 from datetime import datetime
 import cloudinary.uploader
 
@@ -26,7 +24,7 @@ def register():
     if request.method.__eq__("POST"):
 
         password = request.form.get("password")
-        confirm = request.form.get('confirm')
+        confirm = request.form.get("confirm")
 
         if password.__eq__(confirm):
             name = request.form.get("name")
@@ -41,7 +39,7 @@ def register():
                 res = cloudinary.uploader.upload(file)
                 file_path = res['secure_url']
             try:
-                dao.add_user(name=name, username=username, password=password, email=email, phone=phone,
+                add_user(name=name, username=username, password=password, email=email, phone=phone,
                              avatar=file_path)
                 return redirect('/login')
             except:
@@ -61,7 +59,7 @@ def login():
         username = request.form.get("username").strip()
         password = request.form.get("password").strip()
 
-        user = dao.auth_user(username, password)
+        user = auth_user(username, password)
 
         if user:
             login_user(user)
@@ -71,18 +69,18 @@ def login():
             print(" - username:", user.tai_khoan_user)
             print(" - role:", user.role_user)
 
-            ktv = dao.is_ky_thuat_vien(user.id)
+            ktv = is_ky_thuat_vien(user.id)
             if ktv:
-                return redirect((url_for("service_sheet", id = 0 )))
+                return redirect((url_for("service_sheet", id = 0, page=1)))
 
             if role == UserRole.USER:
                 return redirect((url_for("index")))
 
             if role == UserRole.LE_TAN:
-                return redirect((url_for("appointment", id = 0)))
+                return redirect((url_for("appointment", id = 0, page=1)))
 
             if role == UserRole.THU_NGAN:
-                return redirect((url_for("invoice", id = 0)))
+                return redirect((url_for("invoice", id = 0, page=1)))
 
             # if role == UserRole.QUAN_LY:
             #     return redirect((url_for("appointment", id)))
@@ -119,7 +117,7 @@ def logout_my_user():
 
 @login_manager.user_loader
 def get_user(user_id):
-    return dao.get_user_by_id(user_id=user_id)
+    return get_user_by_id(user_id=user_id)
 
 
 @app.route('/services')
@@ -187,7 +185,10 @@ def booking():
 
 
 @app.route('/appointments/<int:id>')
+@login_required
 def appointment(id):
+    if current_user.role_user != UserRole.LE_TAN:
+        return redirect('/')
     kw = request.args.get("search")
     status = request.args.get("status")
     if status == None:
