@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const bookingBtn = document.getElementById('booking-btn');
   const bookingForm = document.querySelector('.booking-form');
 
-  // ================= TẠO 1 DÒNG DỊCH VỤ =================
 
   console.log("list_services =", list_services);
   function createServiceItem() {
@@ -37,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 
 
-  // ================= TÍNH TỔNG THỜI GIAN =================
   function updateDuration() {
     let total = 0;
     const selects = serviceList.querySelectorAll('.service-select');
@@ -53,12 +51,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-  // ================= THÊM DỊCH VỤ =================
   addBtn.addEventListener('click', () => {
     serviceList.appendChild(createServiceItem());
   });
 
-  // ================= XOÁ DỊCH VỤ =================
   serviceList.addEventListener('click', e => {
     if (e.target.classList.contains('remove-btn')) {
       const items = serviceList.querySelectorAll('.service-item');
@@ -69,14 +65,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ================= ĐỔI DỊCH VỤ =================
   serviceList.addEventListener('change', e => {
     if (e.target.classList.contains('service-select')) {
       updateDuration();
     }
   });
 
-  // ================= SUBMIT JSON =================
   bookingBtn.addEventListener('click', e => {
     e.preventDefault();
 
@@ -123,12 +117,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log (services)
 
-    if (used.length === 0) {
+    if (services.length === 0) {
       alert('❌ Vui lòng chọn ít nhất 1 dịch vụ');
       return;
     }
 
-    data ={
+    const data ={
         "name" : name,
         "phone": phone,
         "date": date,
@@ -145,7 +139,10 @@ document.addEventListener('DOMContentLoaded', () => {
       body: JSON.stringify(data)
     })
     .then(res => res.json())
-    .then(data => {
+    .then(res => {
+      alert(res.message || 'Đã tiếp nhận đơn đặt lịch! Bạn đợi bộ phận lễ tân liên hệ xác nhận đặt lịch thành công sau nhá!');
+    })
+    .catch(() => alert('Có lỗi xảy ra'));
 
 
   });
