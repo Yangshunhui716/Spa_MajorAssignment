@@ -12,6 +12,7 @@ def auth_user(username, password):
     print(" - username:", repr(username))
     print(" - raw password:", repr(password))
 
+    password = hashlib.md5(password.encode("utf-8")).hexdigest()
     print(" - hashed:", password)
 
     user = User.query.filter(
@@ -22,18 +23,84 @@ def auth_user(username, password):
     print(" - user found:", user)
     return user
 
-def add_user(name, username,password,avatar, email, phone):
-    u = User(ho_ten_user = name , password_user = password, sdt_user = phone, email_user = email,tai_khoan_user = username)
+
+def add_user(name, username, password, email, phone):
+    password = hashlib.md5(password.encode('utf-8')).hexdigest()
+    u = User(ho_ten_user=name, password_user=password, sdt_user=phone, email_user=email, tai_khoan_user=username)
     db.session.add(u)
     db.session.commit()
+
 
 def get_user_by_id(user_id):
     return User.query.get(user_id)
 
+
+def get_user_by_phone(sdt_user):
+    return User.query.filter_by(sdt_user=sdt_user).first()
+
+
+def get_user_by_username(username):
+    return User.query.filter_by(tai_khoan_user=username).first()
+
+
 def is_ky_thuat_vien(user_id):
-    return db.session.query(KyThuatVien)\
-        .filter(KyThuatVien.ma_ktv == user_id)\
+    return db.session.query(KyThuatVien) \
+        .filter(KyThuatVien.ma_ktv == user_id) \
         .first()
+
+
+def add_dat_lich(data_dat_lich):
+    name = data_dat_lich.get('name')
+    phone = data_dat_lich.get('phone')
+    email = data_dat_lich.get('email')
+    note = data_dat_lich.get('note')
+    date = data_dat_lich.get('date')
+    time = data_dat_lich.get('time')
+
+    print(name,phone)
+
+    gio_hen = datetime.strptime(
+        f"{date} {time}", "%Y-%m-%d %H:%M"
+    )
+
+    user = User.query.filter_by(sdt_user = phone).first()
+
+    if user:
+        user.ho_ten_user = name
+        user.email_user = email
+    else:
+        user = User(
+            ho_ten_user = name,
+            sdt_user = phone,
+            email_user = email
+        )
+
+        db.session.add(user)
+        db.session.flush()
+
+    dat_lich = DatLich(
+        ma_khach_hang = user.id,
+        gio_hen = gio_hen,
+        ghi_chu = note,
+        thoi_gian_xu_ly = datetime.now(),
+        trang_thai_dat_lich = TrangThaiDatLich.CHO_XAC_NHAN
+    )
+
+
+    db.session.add(dat_lich)
+    db.session.flush()
+
+    return dat_lich
+
+def add_dat_lich_detail(ma_dat_lich, services):
+    for s in services:
+        detail = DatLichDetail(
+            ma_dat_lich=ma_dat_lich,
+            ma_dich_vu=s['id'],
+        )
+        db.session.add(detail)
+
+
 
 def load_therapists(therapist_id):
     if therapist_id:
@@ -45,7 +112,7 @@ def get_free_therapists_list(appointment_details):
     appointment = appointment_details[0].dat_lich
     work_shift = work_shift_appointment(appointment.gio_hen)
     therapists_schedule = load_schedule(appointment.gio_hen, work_shift)
-    therapists_list=[]
+    therapists_list = []
 
     start_time = appointment.gio_hen
     for a in appointment_details:

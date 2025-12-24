@@ -6,46 +6,60 @@ from spa_app.dao import load_appointments, get_appointment_details, change_appoi
     assign_therapists, update_sheet_detail, check_discount, load_service_sheets, get_service_sheet_details, \
     count_appointments, count_service_sheets, get_free_therapists_list, add_busy_time, assign_receptionist, \
     get_appointment_status, get_receipt, del_busy_time, add_receipt, get_receipt_discount, auth_user, \
+    add_user, get_user_by_id, is_ky_thuat_vien, get_user_by_phone, get_user_by_username, add_dat_lich, \
+    add_dat_lich_detail
+from spa_app.models import DatLich, TrangThaiDatLich, UserRole, User, DatLichDetail, DichVu, PhieuDichVuDetail, \
+    PhieuDichVu
+from datetime import datetime, timedelta
     add_user, get_user_by_id, is_ky_thuat_vien, get_busy_time
-from spa_app.models import DatLich, TrangThaiDatLich, UserRole, User, KyThuatVien
 from spa_app.decorators import anonymous_required
-from datetime import datetime
 import cloudinary.uploader
 from spa_app.utils import present_service, next_service
 
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    dich_vu_list = DichVu.query.all()
+
+    list_services = [
+        {
+            "id": dv.id,
+            "ten": dv.ten_dich_vu,
+            "thoi_gian": dv.thoi_gian_dich_vu
+        }
+        for dv in dich_vu_list
+    ]
+
+    return render_template(
+        'index.html',
+        dich_vu_list=dich_vu_list,
+        list_services=list_services
+    )
 
 
-@app.route('/register', methods=['get', 'post'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     err_msg = None
-    if request.method.__eq__("POST"):
-
+    if request.method == "POST":
         password = request.form.get("password")
-        confirm = request.form.get("confirm")
+        confirm = request.form.get("confirm_password")
 
-        if password.__eq__(confirm):
+        if password == confirm:
             name = request.form.get("name")
             username = request.form.get("username")
             email = request.form.get("email")
             phone = request.form.get("phone")
-            file = request.files.get('avatar')
 
-            file_path = None
-
-            if file:
-                res = cloudinary.uploader.upload(file)
-                file_path = res['secure_url']
-            try:
-                add_user(name=name, username=username, password=password, email=email, phone=phone,
-                             avatar=file_path)
-                return redirect('/login')
-            except:
-                db.session.rollback()
-                err_msg = "Hệ thống đang bị lỗi! Vui lòng quay lại sau!"
+            existing_phone = get_user_by_phone(phone)
+            if existing_phone:
+                err_msg = "Số điện thoại đã được sử dụng!"
+            else:
+                existing_username = get_user_by_username(username)
+                if existing_username:
+                    err_msg = "Tên tài khoản đã tồn tại!"
+                else:
+                    add_user(name=name, username=username, password=password,
+                             email=email, phone=phone)
         else:
             err_msg = "Mật khẩu không khớp!"
 
@@ -70,6 +84,10 @@ def login():
             print(" - username:", user.tai_khoan_user)
             print(" - role:", user.role_user)
 
+            ktv = is_ky_thuat_vien(user.id)
+            if ktv:
+                return redirect((url_for("service_sheet", id=0, page=1)))
+
             if role == UserRole.USER:
                 return redirect((url_for("index")))
 
@@ -80,7 +98,7 @@ def login():
                 return redirect((url_for("appointment", id = 0, page=1, status='LE_TAN')))
 
             if role == UserRole.THU_NGAN:
-                return redirect((url_for("invoice", id = 0, page=1)))
+                return redirect((url_for("invoice", id=0, page=1)))
 
             next = request.args.get("next")
             return redirect(next if next else "/")
@@ -117,67 +135,54 @@ def admin_login_process():
 
 @app.route('/services')
 def index_services():
-    return render_template('index_services.html')
+    dich_vu_list = DichVu.query.all()
+
+    return render_template('index_services.html', dich_vu_list=dich_vu_list)
 
 
-@app.route('/booking', methods=["GET", "POST"])
+@app.route('/booking', methods=['GET', 'POST'])
 def booking():
-    if request.method == "POST":
-        name = request.form.get("name")
-        email = request.form.get("email")
-        phone = request.form.get("phone")
-        date_str = request.form.get("date")
-        time_str = request.form.get("time")
+    # ---------- GET ----------
+    if request.method == 'GET':
+        dich_vu_list = DichVu.query.all()
 
-        datetime_str = f"{date_str} {time_str}:00"
+        list_services = [
+            {
+                "id": dv.id,
+                "ten": dv.ten_dich_vu,
+                "thoi_gian": dv.thoi_gian_dich_vu
+            }
+            for dv in dich_vu_list
+        ]
 
-        try:
-            gio_hen = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S")
-        except ValueError as e:
-            print("Lỗi parse:", e)
-            return render_template("booking.html", message="Định dạng ngày/giờ không hợp lệ!")
 
-        note = request.form.get("note")
+        return render_template('booking.html', list_services=list_services, dich_vu_list = dich_vu_list)
 
-        user = User.query.filter_by(sdt_user=phone).first()
-        if not user:
-            user = User(
-                ho_ten_user=name,
-                sdt_user=phone,
-                email_user=email,
-                role_user=UserRole.KHACH_HANG
-            )
-            db.session.add(user)
-            db.session.commit()
-        else:
-            user.ho_ten_user = name
-            user.email_user = email
+    # ---------- POST (JSON) ----------
+    data = request.get_json()
 
-            db.session.commit()
+    if not data:
+        return jsonify({
+            "status": "error",
+            "message": "Không nhận được JSON"
+        }), 400
 
-        # Tạo lịch hẹn
-        dat_lich = DatLich(
-            ma_khach_hang=user.id,
-            gio_hen=gio_hen,
-            ghi_chu=note
-        )
-        db.session.add(dat_lich)
+    services = data.get('services')
+
+    try:
+        dat_lich = add_dat_lich(data)
+
+        add_dat_lich_detail(dat_lich.id, services)
+
         db.session.commit()
 
-        last_booking = None
-
-        if current_user.is_authenticated:
-            last_booking = (
-                DatLich.query
-                .filter(DatLich.ma_khach_hang == current_user.id)
-                .order_by(DatLich.ngay_tao.desc())
-                .first()
-            )
-
-        return render_template("index.html", message="Đặt lịch thành công!", last_booking=last_booking)
-
-    return render_template("index.html", )
-
+    except Exception as e:
+        db.session.rollback()
+        print("ERROR:", e)
+        return jsonify({
+            "status": "error",
+            "message": "Lỗi hệ thống"
+        }), 500
 
 @app.route('/appointments/<int:id>')
 @login_required
@@ -188,7 +193,7 @@ def appointment(id):
     status = request.args.get("status")
     if status == None:
         status = 'LE_TAN'
-    page = int(request.args.get("page",id))
+    page = int(request.args.get("page", id))
     pages = math.ceil(count_appointments(status=status, kw=kw) / app.config["PAGE_SIZE"])
 
     appointments = load_appointments(status=status, kw=kw, page=page)

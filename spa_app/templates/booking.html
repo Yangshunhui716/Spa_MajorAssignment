@@ -1,10 +1,19 @@
+
+{%extends 'layout_index/base_index.html'%}
+
 {% block head %}
 <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}">
+
+<style>
+     header{
+        background:#000;
+    }
+</style>
 {%endblock%}
 
-<div id="booking-overlay" style="display:none;">
-    <div class="overlay-bg"></div>
+{% block content %}
+
     <div class="overlay-content">
         <form class="booking-form" action="/booking" method="POST">
             <div class="booking-form">
@@ -17,7 +26,7 @@
                                 <div class="col-md-4">
                                     <label>Họ tên</label>
                                     <input name="name" id="name" type="text" class="form-control"
-                                    value="{{ current_user.ho_ten_user if current_user.is_authenticated else '' }}"/>
+                                           value="{{ current_user.ho_ten_user if current_user.is_authenticated else '' }}"/>
                                 </div>
                                 <div class="col-md-4">
                                     <label>Ngày đặt lịch</label>
@@ -32,18 +41,16 @@
                         <div class="form-block">
                             <label>Số điện thoại</label>
                             <input name="phone" id="phone" type="tel" class="form-control"
-                             value="{{ current_user.sdt_user if current_user.is_authenticated else '' }}"/>
+                                   value="{{ current_user.sdt_user if current_user.is_authenticated else '' }}"/>
                         </div>
                         <div class="form-block">
                             <label>Email</label>
                             <input name="email" id="email" type="email" class="form-control"
-                             value="{{ current_user.email_user if current_user.is_authenticated else '' }}"/>
+                                   value="{{ current_user.email_user if current_user.is_authenticated else '' }}"/>
                         </div>
                         <div class="form-block flex-grow-1">
                             <label>Ghi chú</label>
-                            <textarea name="note" id="note" class="form-control" rows="6">
-                                {{ last_booking.ghi_chu if last_booking else 'chưa có ghi chú' }}
-                            </textarea>
+                            <textarea name="note" id="note" class="form-control" rows="6"></textarea>
                         </div>
                     </div>
                     <!-- Cột phải -->
@@ -55,30 +62,43 @@
                                 <div id="service-list" class="mb-2">
                                     <div class="d-flex align-items-center mb-2 service-item">
                                         <select class="form-select service-select">
-                                            <option value="20">Massage Mặt - 20 phút</option>
-                                            <option value="30">Điều trị mụn - 30 phút</option>
-                                            <option value="25">Triệt lông - 25 phút</option>
+                                            <option value="">-- Chọn dịch vụ --</option>
+
+                                            {% for dv in dich_vu_list %}
+                                            <option
+                                                    value="{{ dv.id }}"
+                                                    data-time="{{ dv.thoi_gian_dich_vu }}"
+                                                    data-rest="{{ dv.thoi_gian_nghi_ngoi }}"
+                                            >
+                                                {{ dv.ten_dich_vu }} - {{ dv.thoi_gian_dich_vu }} phút
+                                            </option>
+                                            {% endfor %}
                                         </select>
                                         <button type="button" class="remove-btn">×</button>
                                     </div>
                                 </div>
                             </div>
                             <!-- Footer dịch vụ -->
-                            <div class="service-footer">
+                            <div  class="service-footer">
                                 <button type="button" class="add-service" id="add-service-btn">Thêm dịch vụ</button>
                                 <div>
                                     <span>Tổng thời gian dự kiến: </span>
-                                    <span id="duration">20 phút</span>
+                                    <span id="duration">0 phút</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <button id="booking-btn" class="btn btn-dark w-100 mt-4" type="submit">Đặt lịch</button>
+                <button id="booking-btn" class="btn btn-dark w-100 mt-4" type="button">Đặt lịch</button>
             </div>
         </form>
-    </div>
+
 </div>
+
+{%endblock%}
 {%block footer%}
+<script>
+    const list_services = {{ list_services | default([], true)| tojson }};
+</script>
 <script src="{{ url_for('static', filename='js/booking.js') }}"></script>
 {%endblock%}

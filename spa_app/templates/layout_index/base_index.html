@@ -23,25 +23,20 @@
     {%block head%} {%endblock%}
 
     <script>
-     window.addEventListener("scroll", function() {
-       const header = document.querySelector("header");
-       if (window.scrollY > 50) { // khi cuộn xuống > 50px
-         header.classList.remove("default");
-         header.classList.add("scrolled");
-       } else {
-         header.classList.remove("scrolled");
-         header.classList.add("default");
-       }
-     });
+        window.addEventListener("scroll", function() {
+          const header = document.querySelector("header");
+          if (window.scrollY > 50) { // khi cuộn xuống > 50px
+            header.classList.remove("default");
+            header.classList.add("scrolled");
+          } else {
+            header.classList.remove("scrolled");
+            header.classList.add("default");
+          }
+        });
     </script>
 
 </head>
 <body class="d-flex h-100 w-100 text-center text-black ">
-
-
-    {%block booking%}
-    {%include 'booking.html'%}
-    {%endblock%}
 
 <div class="cover-container d-flex w-100 h-100 mx-auto flex-column">
     {%block header%}
