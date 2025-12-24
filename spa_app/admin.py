@@ -193,7 +193,7 @@ class ThongKeView(AdminModeView):
         )
 
 
-admin = Admin(app=app, name="SPA_APP", theme=Bootstrap4Theme(), index_view=MyAdminIndexView())
+admin = Admin(app=app, name="VỊ SPA", theme=Bootstrap4Theme(), index_view=MyAdminIndexView())
 
 admin.add_view(MyUserView(User, db.session))
 admin.add_view(MyKyThuatVienView(KyThuatVien, db.session))

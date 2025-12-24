@@ -1,10 +1,10 @@
 <header class="mb-auto" style="height: 8vh">
     <div>
         <nav class="nav-masthead d-flex align-items-center text-white p-2">
-            <!-- Logo bên trái -->
+
             <a class="navbar-brand content-left align-items-center text-white fw-bolder" href="/">VỊ SPA</a>
 
-            <!-- Menu nav ở giữa -->
+
             <div class="nav justify-content-center flex-grow-1">
                 <a class="nav-link text-white {% if request.endpoint == 'index' %}active{% endif %}"
                    href="{{ url_for('index') }}">TRANG CHỦ</a>
@@ -24,7 +24,7 @@
                     {%endif%}
                 {%endif%}
             </div>
-            <!-- Sign In bên phải -->
+
             {% if current_user.is_authenticated%}
             <div>
                 <a class="nav-link text-white" href="{{ url_for('index') }}">Chào {{ current_user.ho_ten_user }}</a>

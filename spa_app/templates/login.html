@@ -89,6 +89,9 @@
 <div class="center-container">
     <div class="card">
         <h2>Đăng nhập</h2>
+        {% if err_msg%}
+            <div class="alert alert-danger">{{err_msg}}</div>
+        {% endif %}
         <form method="post">
             <div class="field">
                 <label for="tai_khoan_user">Tài khoản</label>

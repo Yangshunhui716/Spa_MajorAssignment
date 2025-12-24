@@ -83,9 +83,11 @@ def login():
             print(" - username:", user.tai_khoan_user)
             print(" - role:", user.role_user)
 
-            ktv = is_ky_thuat_vien(user.id)
-            if ktv:
-                return redirect((url_for("service_sheet", id=0, page=1)))
+            if role == UserRole.QUAN_TRI_VIEN:
+                return redirect((url_for("admin.index")))
+
+            if role == UserRole.QUAN_LY:
+                return redirect((url_for("admin.index")))
 
             if role == UserRole.USER:
                 return redirect((url_for("index")))
@@ -371,6 +373,14 @@ def invoice(id):
     pages = math.ceil(count_service_sheets(kw, flag) / app.config["PAGE_SIZE"])
 
     service_sheets = load_service_sheets(kw=kw, page=page, flag=flag)
+    time_end=[]
+    for s in service_sheets:
+        busy_time = get_busy_time(appointment_id=s.ma_dat_lich)
+        if busy_time is None:
+            time_end.append(0)
+        else:
+            time_end.append(busy_time[0].thoi_gian_ket_thuc)
+
     service_sheet_detail = None
     receipt = None
     receipt_discount = None
@@ -405,7 +415,8 @@ def invoice(id):
                            receipt=receipt,
                            receipt_discount=receipt_discount,
                            invoice=invoice,
-                           total_tmp=total_tmp)
+                           total_tmp=total_tmp,
+                           time_end=time_end)
 
 
 @app.route('/invoices/<int:id>/add_discount', methods=['PUT'])

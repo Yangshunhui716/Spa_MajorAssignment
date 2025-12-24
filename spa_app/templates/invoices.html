@@ -75,7 +75,7 @@
                         {%for s in service_sheets%}
                         <tr onclick="displayInvoice({{s.id}})">
                             <td class="table-first-col">{{s.dat_lich.khach_hang.ho_ten_user}}</td>
-                            <td class="servicessheet-table-col">10:00</td>
+                            <td class="servicessheet-table-col text-center">{{time_end[loop.index0].strftime('%H:%M')}}</td>
                             <td class="servicessheet-table-col">{{s.dat_lich.trang_thai_dat_lich.name}}</td>
                         </tr>
                         {%endfor%}
@@ -120,7 +120,7 @@
                             <input type="text" id="resultDisplay" class="form-control" readonly>
                         </div>
                     </div>
-                    <div class="tab-pane container fade" id="tranfer" style="background: white">Tính năng chưa có :))</div>
+                    <div class="tab-pane container fade" id="tranfer" style="background: white"></div>
                 </div>
             </div>
         </div>

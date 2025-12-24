@@ -88,7 +88,6 @@ class DichVu(BaseModel):
 
 class KyThuatVien(db.Model):
     ma_ktv = Column(Integer, ForeignKey(User.id, ondelete='CASCADE'), primary_key=True, nullable=False)
-    so_luong_khach = Column(Integer, nullable=False, default=0)
     dich_vu_chuyen_mon = Column(Integer, ForeignKey(DichVu.id), nullable=False)
 
     dat_lich_detail = relationship("DatLichDetail", backref="ky_thuat_vien", lazy=True)

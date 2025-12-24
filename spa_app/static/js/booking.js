@@ -141,6 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(res => res.json())
     .then(res => {
       alert(res.message || 'Đã tiếp nhận đơn đặt lịch! Bạn đợi bộ phận lễ tân liên hệ xác nhận đặt lịch thành công sau nhá!');
+      window.location.href = "/";
     })
     .catch(() => alert('Có lỗi xảy ra'));
 

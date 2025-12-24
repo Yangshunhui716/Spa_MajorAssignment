@@ -136,7 +136,7 @@ def get_busy_time(therapist_id=None, start_time=None, end_time=None, count=False
         return ThoiGianKTVBan.query.filter(ThoiGianKTVBan.ma_ky_thuat_vien == therapist_id).count()
     if appointment_id:
         return (ThoiGianKTVBan.query.filter(ThoiGianKTVBan.ma_dat_lich==appointment_id)
-                .order_by(ThoiGianKTVBan.thoi_gian_ket_thuc.desc()).first())
+                .order_by(ThoiGianKTVBan.thoi_gian_ket_thuc.desc()).all())
     return (ThoiGianKTVBan.query.filter(ThoiGianKTVBan.ma_ky_thuat_vien == therapist_id)
             .order_by(ThoiGianKTVBan.thoi_gian_bat_dau.asc()).all())
 
@@ -310,8 +310,8 @@ def change_appointment_status(appointment_id, status):
 
 def assign_receptionist(appointment_id, receptionist_id):
     a = load_appointments(appointment_id=appointment_id)
-    a.ma_le_tan = receptionist_id
-    a.thoi_gian_xu_ly = datetime.now()
+    a[0].ma_le_tan = receptionist_id
+    a[0].thoi_gian_xu_ly = datetime.now()
     db.session.commit()
 
 
@@ -327,11 +327,11 @@ def assign_therapists(appointment_id, selected_therapists):
 
 def add_busy_time(appointment_id, selected_therapists):
     a = load_appointments(appointment_id=appointment_id)
-    start_time = a.gio_hen
+    start_time = a[0].gio_hen
     for th in selected_therapists:
         therapist = load_therapists(therapist_id=th["ma_ktv"])
         end_time = start_time + timedelta(minutes=therapist.dich_vu.thoi_gian_dich_vu+therapist.dich_vu.thoi_gian_nghi_ngoi)
-        busy = ThoiGianKTVBan(ma_ky_thuat_vien = therapist.user.id, ma_dat_lich = a.id,
+        busy = ThoiGianKTVBan(ma_ky_thuat_vien = therapist.user.id, ma_dat_lich = a[0].id,
                               thoi_gian_bat_dau=start_time, thoi_gian_ket_thuc=end_time)
         db.session.add(busy)
         start_time=end_time - timedelta(minutes=therapist.dich_vu.thoi_gian_nghi_ngoi)
