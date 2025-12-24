@@ -7,11 +7,10 @@ from spa_app.dao import load_appointments, get_appointment_details, change_appoi
     count_appointments, count_service_sheets, get_free_therapists_list, add_busy_time, assign_receptionist, \
     get_appointment_status, get_receipt, del_busy_time, add_receipt, get_receipt_discount, auth_user, \
     add_user, get_user_by_id, is_ky_thuat_vien, get_user_by_phone, get_user_by_username, add_dat_lich, \
-    add_dat_lich_detail
+    add_dat_lich_detail, get_busy_time
 from spa_app.models import DatLich, TrangThaiDatLich, UserRole, User, DatLichDetail, DichVu, PhieuDichVuDetail, \
-    PhieuDichVu
+    PhieuDichVu, KyThuatVien
 from datetime import datetime, timedelta
-    add_user, get_user_by_id, is_ky_thuat_vien, get_busy_time
 from spa_app.decorators import anonymous_required
 import cloudinary.uploader
 from spa_app.utils import present_service, next_service
@@ -176,13 +175,14 @@ def booking():
 
         db.session.commit()
 
-    except Exception as e:
-        db.session.rollback()
-        print("ERROR:", e)
-        return jsonify({
-            "status": "error",
-            "message": "Lỗi hệ thống"
-        }), 500
+
+    except Exception as ex:
+
+        return jsonify({"status": 500, "err_msg": str(ex)})
+
+    else:
+
+        return jsonify({"status": 200, "sc_msg": "Đã tiếp nhận thông tin đặt lịch! VUi lòng đợi lễ tân liên hệ lại để xác nhận đặt lịch"})
 
 @app.route('/appointments/<int:id>')
 @login_required

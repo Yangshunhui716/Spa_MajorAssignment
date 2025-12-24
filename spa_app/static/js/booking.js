@@ -51,23 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     durationEl.textContent = total + ' phút';
   }
 
-  // ================= SYNC HIDDEN =================
-  function syncHiddenServices() {
-    hidden.innerHTML = '';
-    const selects = serviceList.querySelectorAll('.service-select');
-    const used = new Set();
 
-    selects.forEach(select => {
-      if (!select.value || used.has(select.value)) return;
-      used.add(select.value);
-
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'services[]';
-      input.value = select.value;
-      hidden.appendChild(input);
-    });
-  }
 
   // ================= THÊM DỊCH VỤ =================
   addBtn.addEventListener('click', () => {
@@ -81,7 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (items.length > 1) {
         e.target.closest('.service-item').remove();
         updateDuration();
-        syncHiddenServices();
       }
     }
   });
@@ -90,7 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
   serviceList.addEventListener('change', e => {
     if (e.target.classList.contains('service-select')) {
       updateDuration();
-      syncHiddenServices();
     }
   });
 
@@ -163,10 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
       body: JSON.stringify(data)
     })
     .then(res => res.json())
-    .then(res => {
-      alert(res.message || 'Đã tiếp nhận đơn đặt lịch! Bạn đợi bộ phận lễ tân liên hệ xác nhận đặt lịch thành công sau nhá!');
-    })
-    .catch(() => alert('Có lỗi xảy ra'));
+    .then(data => {
 
 
   });
