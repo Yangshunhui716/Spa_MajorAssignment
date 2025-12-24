@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const bookingBtn = document.getElementById('booking-btn');
   const bookingForm = document.querySelector('.booking-form');
 
-  // ================= TẠO 1 DÒNG DỊCH VỤ =================
 
   console.log("list_services =", list_services);
   function createServiceItem() {
@@ -37,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 
 
-  // ================= TÍNH TỔNG THỜI GIAN =================
   function updateDuration() {
     let total = 0;
     const selects = serviceList.querySelectorAll('.service-select');
@@ -51,50 +49,28 @@ document.addEventListener('DOMContentLoaded', () => {
     durationEl.textContent = total + ' phút';
   }
 
-  // ================= SYNC HIDDEN =================
-  function syncHiddenServices() {
-    hidden.innerHTML = '';
-    const selects = serviceList.querySelectorAll('.service-select');
-    const used = new Set();
 
-    selects.forEach(select => {
-      if (!select.value || used.has(select.value)) return;
-      used.add(select.value);
 
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'services[]';
-      input.value = select.value;
-      hidden.appendChild(input);
-    });
-  }
-
-  // ================= THÊM DỊCH VỤ =================
   addBtn.addEventListener('click', () => {
     serviceList.appendChild(createServiceItem());
   });
 
-  // ================= XOÁ DỊCH VỤ =================
   serviceList.addEventListener('click', e => {
     if (e.target.classList.contains('remove-btn')) {
       const items = serviceList.querySelectorAll('.service-item');
       if (items.length > 1) {
         e.target.closest('.service-item').remove();
         updateDuration();
-        syncHiddenServices();
       }
     }
   });
 
-  // ================= ĐỔI DỊCH VỤ =================
   serviceList.addEventListener('change', e => {
     if (e.target.classList.contains('service-select')) {
       updateDuration();
-      syncHiddenServices();
     }
   });
 
-  // ================= SUBMIT JSON =================
   bookingBtn.addEventListener('click', e => {
     e.preventDefault();
 
@@ -141,12 +117,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log (services)
 
-    if (used.length === 0) {
+    if (services.length === 0) {
       alert('❌ Vui lòng chọn ít nhất 1 dịch vụ');
       return;
     }
 
-    data ={
+    const data ={
         "name" : name,
         "phone": phone,
         "date": date,

@@ -162,14 +162,20 @@ def booking():
             "message": "Không nhận được JSON"
         }), 400
 
-    services = data.get('services')
+    services = data.get('services', [])
+
+    if not services:
+        return jsonify({"status": "error", "message": "Chưa chọn dịch vụ"}), 400
 
     try:
         dat_lich = add_dat_lich(data)
-
         add_dat_lich_detail(dat_lich.id, services)
 
         db.session.commit()
+        return jsonify({
+            "status": "success",
+            "message": "Đặt lịch thành công"
+        })
 
     except Exception as e:
         db.session.rollback()
