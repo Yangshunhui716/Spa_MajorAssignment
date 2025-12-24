@@ -49,6 +49,59 @@ def is_ky_thuat_vien(user_id):
         .first()
 
 
+def add_dat_lich(data_dat_lich):
+    name = data_dat_lich.get('name')
+    phone = data_dat_lich.get('phone')
+    email = data_dat_lich.get('email')
+    note = data_dat_lich.get('note')
+    date = data_dat_lich.get('date')
+    time = data_dat_lich.get('time')
+
+    print(name,phone)
+
+    gio_hen = datetime.strptime(
+        f"{date} {time}", "%Y-%m-%d %H:%M"
+    )
+
+    user = User.query.filter_by(sdt_user = phone).first()
+
+    if user:
+        user.ho_ten_user = name
+        user.email_user = email
+    else:
+        user = User(
+            ho_ten_user = name,
+            sdt_user = phone,
+            email_user = email
+        )
+
+        db.session.add(user)
+        db.session.flush()
+
+    dat_lich = DatLich(
+        ma_khach_hang = user.id,
+        gio_hen = gio_hen,
+        ghi_chu = note,
+        thoi_gian_xu_ly = datetime.now(),
+        trang_thai_dat_lich = TrangThaiDatLich.CHO_XAC_NHAN
+    )
+
+
+    db.session.add(dat_lich)
+    db.session.flush()
+
+    return dat_lich
+
+def add_dat_lich_detail(ma_dat_lich, services):
+    for s in services:
+        detail = DatLichDetail(
+            ma_dat_lich=ma_dat_lich,
+            ma_dich_vu=s['id'],
+        )
+        db.session.add(detail)
+
+
+
 def load_therapists(therapist_id):
     if therapist_id:
         return KyThuatVien.query.get(therapist_id)

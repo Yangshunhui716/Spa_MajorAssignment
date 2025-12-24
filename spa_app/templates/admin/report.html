@@ -1,67 +1,119 @@
 {% extends 'admin/master.html' %}
 {% block body %}
 
-<h3>📊 BÁO CÁO THỐNG KÊ (PHIẾU DỊCH VỤ)</h3>
+<div class="container-fluid">
 
-<hr>
+    <h3 class="mb-4">📊 BÁO CÁO THỐNG KÊ (PHIẾU DỊCH VỤ)</h3>
 
-<h5>1️⃣ Doanh thu theo tháng</h5>
+    <!-- ================= DOANH THU ================= -->
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            1️⃣ Doanh thu theo tháng
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- TABLE -->
+                <div class="col-md-5">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Tháng</th>
+                            <th class="text-end">Doanh thu</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for thang, doanh_thu in doanh_thu_thang %}
+                        <tr>
+                            <td>{{ thang }}</td>
+                            <td class="text-end">
+                                {{ "{:,.0f}".format(doanh_thu or 0) }} đ
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
 
-<table class="table table-bordered">
-    <tr>
-        <th>Tháng</th>
-        <th>Doanh thu</th>
-    </tr>
-    {% for thang, doanh_thu in doanh_thu_thang %}
-    <tr>
-        <td>{{ thang }}</td>
-        <td>{{ "{:,.0f}".format(doanh_thu or 0) }}</td>
-    </tr>
-    {% endfor %}
-</table>
+                <!-- CHART -->
+                <div class="col-md-7">
+                    <canvas id="doanhThuChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<canvas id="doanhThuChart" width="300" height="100"></canvas>
+    <!-- ================= TẦN SUẤT ================= -->
+    <div class="card">
+        <div class="card-header bg-dark text-white">
+            2️⃣ Tần suất sử dụng dịch vụ
+        </div>
+        <div class="card-body">
 
-<hr>
+            <!-- TABLE -->
+            <table class="table table-bordered table-hover mb-4">
+                <thead class="table-light">
+                <tr>
+                    <th>Tháng</th>
+                    <th>Dịch vụ</th>
+                    <th class="text-center">Số lần</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for thang, ten_dv, so_lan in tan_suat_dich_vu %}
+                <tr>
+                    <td>{{ thang }}</td>
+                    <td>{{ ten_dv }}</td>
+                    <td class="text-center">{{ so_lan }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
 
-<h5>2️⃣ Tần suất sử dụng dịch vụ</h5>
+            <!-- CHART GRID -->
+            <div class="row">
+                {% for thang, dv in tan_suat_chart.items() %}
+                <div class="col-md-4 mb-4">
+                    <div class="border rounded p-3 h-100">
+                        <h6 class="text-center fw-bold mb-3">{{ thang }}</h6>
+                        <canvas id="chart_{{ loop.index }}" height="200"></canvas>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
 
-<table class="table table-bordered">
-    <tr>
-        <th>Tháng</th>
-        <th>Dịch vụ</th>
-        <th>Số lần</th>
-    </tr>
-    {% for thang, ten_dv, so_lan in tan_suat_dich_vu %}
-    <tr>
-        <td>{{ thang }}</td>
-        <td>{{ ten_dv }}</td>
-        <td>{{ so_lan }}</td>
-    </tr>
-    {% endfor %}
-</table>
+        </div>
+    </div>
 
-{% for thang, dv in tan_suat_chart.items() %}
-<h6>{{ thang }}</h6>
-    <canvas width="10px" id="chart_{{ loop.index }}"></canvas>
-{% endfor %}
+</div>
 
+<!-- ================= SCRIPT ================= -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
+    // ===== DOANH THU =====
     const doanhThu = {{ doanh_thu_chart | tojson }};
     new Chart(document.getElementById('doanhThuChart'), {
         type: 'bar',
         data: {
             labels: doanhThu.labels,
             datasets: [{
-                label: 'Doanh thu',
-                data: doanhThu.data
+                label: 'Doanh thu (VNĐ)',
+                data: doanhThu.data,
+                backgroundColor: '#0d6efd'
             }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
         }
     });
 
+    // ===== TẦN SUẤT =====
     const tanSuat = {{ tan_suat_chart | tojson }};
     let i = 1;
+
     for (const [thang, dv] of Object.entries(tanSuat)) {
         new Chart(document.getElementById('chart_' + i), {
             type: 'pie',
@@ -70,6 +122,14 @@
                 datasets: [{
                     data: Object.values(dv)
                 }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
             }
         });
         i++;

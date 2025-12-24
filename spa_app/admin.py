@@ -31,7 +31,7 @@ class AuthenTicatedView(ModelView):
         return current_user.is_authenticated and current_user.role_user == UserRole.QUAN_LY
 
 
-class AdminModeView(ModelView):
+class AdminModeView(BaseView):
     def is_accessible(self) -> bool:
         return current_user.is_authenticated and current_user.role_user == UserRole.QUAN_TRI_VIEN
 
@@ -105,6 +105,18 @@ class MyKhMaGiamGiaView(AuthenTicatedView):
     }
 
 
+class MyTGBKtvView(AuthenTicatedView):
+    column_labels = {
+        'ky_thuat_vien': "Mã kỹ thuật viên"
+    }
+
+class MyTGBKtvBanView(AuthenTicatedView):
+    column_labels = {
+        'thoi_gian_bat_dau': "Thời gian bắt đầu",
+        'thoi_gian_ket_thuc': "Thời gian kết thúc"
+    }
+
+
 class MyAdminIndexView(AdminIndexView):
     @expose("/")
     def index(self) -> str:
@@ -118,7 +130,7 @@ class MyAdminLogoutView(BaseView):
         return self.render("admin/index.html")
 
 
-class ThongKeView(BaseView):
+class ThongKeView(AdminModeView):
 
     @expose('/')
     def index(self):
@@ -189,10 +201,9 @@ admin.add_view(MyDichVuView(DichVu, db.session))
 admin.add_view(MyVatView(VAT, db.session))
 admin.add_view(MyMaGiamGiaView(MaGiamGia, db.session))
 admin.add_view(MyKhMaGiamGiaView(KhachHangMaGiamGia, db.session))
-admin.add_view(MyAdminLogoutView("Đăng xuất"))
-admin.add_view(ModelView(ThoiGianKTVBan, db.session))
-admin.add_view(ModelView(ThoiGianBieuKTV, db.session))
+admin.add_view(MyTGBKtvView(ThoiGianKTVBan, db.session))
+admin.add_view(MyTGBKtvBanView(ThoiGianBieuKTV, db.session))
 
-admin.add_view(
-    ThongKeView(name="Thống kê - Báo cáo", endpoint="thongke")
-)
+admin.add_view(ThongKeView(name="Thống kê - Báo cáo", endpoint="thongke"))
+admin.add_view(MyAdminLogoutView("Đăng xuất"))
+

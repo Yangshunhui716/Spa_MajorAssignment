@@ -6,7 +6,8 @@ from spa_app.dao import load_appointments, get_appointment_details, change_appoi
     assign_therapists, update_sheet_detail, check_discount, load_service_sheets, get_service_sheet_details, \
     count_appointments, count_service_sheets, get_free_therapists_list, add_busy_time, assign_receptionist, \
     get_appointment_status, get_receipt, del_busy_time, add_receipt, get_receipt_discount, auth_user, \
-    add_user, get_user_by_id, is_ky_thuat_vien, get_user_by_phone, get_user_by_username
+    add_user, get_user_by_id, is_ky_thuat_vien, get_user_by_phone, get_user_by_username, add_dat_lich, \
+    add_dat_lich_detail
 from spa_app.models import DatLich, TrangThaiDatLich, UserRole, User, DatLichDetail, DichVu, PhieuDichVuDetail, \
     PhieuDichVu
 from decorators import anonymous_required
@@ -134,121 +135,49 @@ def index_services():
     return render_template('index_services.html', dich_vu_list=dich_vu_list)
 
 
-@app.route('/booking', methods=["GET", "POST"])
+@app.route('/booking', methods=['GET', 'POST'])
 def booking():
-    dich_vu_list = DichVu.query.all()
+    # ---------- GET ----------
+    if request.method == 'GET':
+        dich_vu_list = DichVu.query.all()
 
-    list_services = [
-        {
-            "id": dv.id,
-            "ten": dv.ten_dich_vu,
-            "thoi_gian": dv.thoi_gian_dich_vu
-        }
-        for dv in dich_vu_list
-    ]
-
-    if request.method == "POST":
-
-        name = request.form.get("name")
-        email = request.form.get("email")
-        phone = request.form.get("phone")
-        date_str = request.form.get("date")
-        time_str = request.form.get("time")
-        note = request.form.get("note", "")
-
-        try:
-            gio_hen = datetime.strptime(
-                f"{date_str} {time_str}:00",
-                "%Y-%m-%d %H:%M:%S"
-            )
-        except ValueError:
-            return render_template(
-                "index.html",
-                message="Định dạng ngày/giờ không hợp lệ!",
-                dich_vu_list=dich_vu_list,
-                list_services=list_services
-            )
-
-        user = User.query.filter_by(sdt_user=phone).first()
-        if not user:
-            user = User(
-                ho_ten_user=name,
-                sdt_user=phone,
-                email_user=email,
-                role_user=UserRole.KHACH_HANG
-            )
-            db.session.add(user)
-            db.session.flush()
-        else:
-            user.ho_ten_user = name
-            user.email_user = email
-
-        dat_lich = DatLich(
-            ma_khach_hang=user.id,
-            gio_hen=gio_hen,
-            ghi_chu=note
-        )
-        db.session.add(dat_lich)
-        db.session.flush()
-
-        phieu_dich_vu = PhieuDichVu(
-            ma_dat_lich=dat_lich.id
-        )
-        db.session.add(phieu_dich_vu)
-        db.session.flush()
+        list_services = [
+            {
+                "id": dv.id,
+                "ten": dv.ten_dich_vu,
+                "thoi_gian": dv.thoi_gian_dich_vu
+            }
+            for dv in dich_vu_list
+        ]
 
 
-        service_ids = request.form.getlist("list_services")
-        print("SERVICE IDS:", service_ids)
-        print("LEN:", len(service_ids))
-        tong_thoi_gian = 0
+        return render_template('booking.html', list_services=list_services, dich_vu_list = dich_vu_list)
 
-        for ma_dich_vu in service_ids:
-            ma_dich_vu = int(ma_dich_vu)
-            dich_vu = DichVu.query.get(ma_dich_vu)
-            if not dich_vu:
-                continue
+    # ---------- POST (JSON) ----------
+    data = request.get_json()
 
+    if not data:
+        return jsonify({
+            "status": "error",
+            "message": "Không nhận được JSON"
+        }), 400
 
-            dat_lich_detail = DatLichDetail(
-                ma_dat_lich=dat_lich.id,
-                ma_dich_vu=ma_dich_vu,
-                ma_ky_thuat_vien=None
-            )
-            db.session.add(dat_lich_detail)
+    services = data.get('services')
 
+    try:
+        dat_lich = add_dat_lich(data)
 
-            phieu_detail = PhieuDichVuDetail(
-                ma_phieu_dich_vu=phieu_dich_vu.id,
-                ma_dich_vu=ma_dich_vu,
-            )
-            db.session.add(phieu_detail)
-
-            tong_thoi_gian += (
-                dich_vu.thoi_gian_dich_vu +
-                dich_vu.thoi_gian_nghi_ngoi
-            )
-
-
-        dat_lich.thoi_gian_xu_ly = gio_hen + timedelta(
-            minutes=tong_thoi_gian
-        )
-
+        add_dat_lich_detail(dat_lich.id, services)
 
         db.session.commit()
 
-        return render_template(
-            "index.html",
-            message="Đặt lịch thành công!",
-            dich_vu_list=dich_vu_list,
-            list_services=list_services
-        )
-
-    return render_template(
-        "index.html",
-        dich_vu_list=dich_vu_list,
-        list_services=list_services
-    )
+    except Exception as e:
+        db.session.rollback()
+        print("ERROR:", e)
+        return jsonify({
+            "status": "error",
+            "message": "Lỗi hệ thống"
+        }), 500
 
 @app.route('/appointments/<int:id>')
 @login_required
