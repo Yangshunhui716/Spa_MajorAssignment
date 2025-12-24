@@ -1,22 +1,24 @@
 <header id="main-header" class="no-print">
     <nav class="navbar navbar-expand-sm bg-dark navbar-dark ps-3">
         <div class="container-fluid content">
-            <a class="navbar-brand content-left align-items-center" href="#">Logo</a>
+            <a class="navbar-brand content-left align-items-center" href="/">VỊ SPA</a>
+            <div class="ps-5 text-white text">
+                {%if current_user.role_user.name == 'LE_TAN'%}
+                TRANG LỄ TÂN
+                {%endif%}
+                {%if current_user.role_user.name == 'KY_THUAT_VIEN'%}
+                TRANG KỸ THUẬT VIÊN
+                {%endif%}
+                {%if current_user.role_user.name == 'THU_NGAN'%}
+                TRANG THU NGÂN
+                {%endif%}
+            </div>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse content-right justify-content-end" id="collapsibleNavbar">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
-                    </li>
-                </ul>
+                <a class="nav-link text-white text" href="{{ url_for('index') }}">Chào! {{ current_user.ho_ten_user }}</a>
+                <a class="nav-link text-white btn-secondary text" href="{{ url_for('logout_my_user') }}">Đăng Xuất</a>
             </div>
         </div>
     </nav>

@@ -6,11 +6,12 @@ from spa_app.dao import load_appointments, get_appointment_details, change_appoi
     assign_therapists, update_sheet_detail, check_discount, load_service_sheets, get_service_sheet_details, \
     count_appointments, count_service_sheets, get_free_therapists_list, add_busy_time, assign_receptionist, \
     get_appointment_status, get_receipt, del_busy_time, add_receipt, get_receipt_discount, auth_user, \
-    add_user, get_user_by_id, is_ky_thuat_vien
-from spa_app.models import DatLich, TrangThaiDatLich, UserRole, User
+    add_user, get_user_by_id, is_ky_thuat_vien, get_busy_time
+from spa_app.models import DatLich, TrangThaiDatLich, UserRole, User, KyThuatVien
 from spa_app.decorators import anonymous_required
 from datetime import datetime
 import cloudinary.uploader
+from spa_app.utils import present_service, next_service
 
 
 @app.route('/')
@@ -73,10 +74,10 @@ def login():
                 return redirect((url_for("index")))
 
             if role == UserRole.KY_THUAT_VIEN:
-                return redirect((url_for("service_sheet", id = 0, page=1)))
+                return redirect((url_for("service_sheet", id = 0, page=1, status='KTV')))
 
             if role == UserRole.LE_TAN:
-                return redirect((url_for("appointment", id = 0, page=1)))
+                return redirect((url_for("appointment", id = 0, page=1, status='LE_TAN')))
 
             if role == UserRole.THU_NGAN:
                 return redirect((url_for("invoice", id = 0, page=1)))
@@ -168,7 +169,7 @@ def booking():
         if current_user.is_authenticated:
             last_booking = (
                 DatLich.query
-                .filter(DatLich.user_id == current_user.id)
+                .filter(DatLich.ma_khach_hang == current_user.id)
                 .order_by(DatLich.ngay_tao.desc())
                 .first()
             )
@@ -196,7 +197,7 @@ def appointment(id):
 
     if id > 0:
         appointment_details = get_appointment_details(appointment_id=id)
-        if get_appointment_status(appointment_id=appointment_details[0].dat_lich.id) == TrangThaiDatLich.CHO_XAC_NHAN:
+        if get_appointment_status(appointment_id=id) == TrangThaiDatLich.CHO_XAC_NHAN:
             therapists = get_free_therapists_list(appointment_details=appointment_details)
 
     return render_template("appointments.html", pages=pages, page=page, id=id, kw=kw, status=status,
@@ -206,6 +207,7 @@ def appointment(id):
 
 
 @app.route('/appointments/<int:id>/success', methods=['POST'])
+@login_required
 def success_appointment(id):
     if current_user.role_user != UserRole.LE_TAN:
         return redirect('/')
@@ -221,7 +223,7 @@ def success_appointment(id):
         return jsonify({"status": 400, "err_msg": "Dữ liệu không hợp lệ"})
 
     add_busy_time(appointment_id=id, selected_therapists=selected_therapists)
-    assign_receptionist(appointment_id=id, receptionist_id=5)
+    assign_receptionist(appointment_id=id, receptionist_id=current_user.id)
     change_appointment_status(appointment_id=id, status=TrangThaiDatLich.DA_XAC_NHAN)
 
     return jsonify({
@@ -230,6 +232,7 @@ def success_appointment(id):
 
 
 @app.route('/appointments/<int:id>/carryOut')
+@login_required
 def carry_out_appointment(id):
     if current_user.role_user != UserRole.LE_TAN:
         return redirect('/')
@@ -238,6 +241,7 @@ def carry_out_appointment(id):
 
 
 @app.route('/appointments/<int:id>/cancel')
+@login_required
 def cancel_appointment(id):
     if current_user.role_user != UserRole.LE_TAN:
         return redirect('/')
@@ -254,27 +258,42 @@ def service_sheet(id):
     kw = request.args.get("search")
     status = request.args.get("status")
     hind = False
-    appointment_details = get_appointment_details(therapist_id=current_user.id)
+
+    therapist = KyThuatVien.query.get(current_user.id)
+    therapist_busy_time = get_busy_time(therapist_id=therapist.user.id)
+    service_now = present_service(id)
+    service_next = next_service(id)
+
     if status == None:
         status = 'KTV'
     elif status == 'DA_XAC_NHAN':
         hind = True
+
     page = int(request.args.get("page", id))
-    pages = math.ceil(count_appointments(status=status, kw=kw, hind=hind, appointment_details=appointment_details) / app.config["PAGE_SIZE"])
-    appointments = load_appointments(status=status, kw=kw, page=page, hind=hind, appointment_details=appointment_details)
+    pages = math.ceil(count_appointments(status=status, kw=kw, hind=hind, appointments=therapist_busy_time) / app.config["PAGE_SIZE"])
+    appointments = load_appointments(status=status, kw=kw, page=page, hind=hind, appointments=therapist_busy_time)
+
     service_sheet_details = None
+    appointment_details = None
+
     if id > 0:
         if load_service_sheets(appointment_id=id):
             sheet = load_service_sheets(appointment_id=id)
             service_sheet_details = get_service_sheet_details(service_sheet_id=sheet.id)
         appointment_details = get_appointment_details(appointment_id=id)
+
     return render_template("serviceSheets.html", pages=pages, page=page, id=id, kw=kw, status=status,
                            service_sheet_details=service_sheet_details,
                            appointments=appointments,
-                           appointment_details=appointment_details)
+                           appointment_details=appointment_details,
+                           therapist_busy_time=therapist_busy_time,
+                           user=therapist,
+                           service_now=service_now,
+                           service_next=service_next)
 
 
 @app.route('/serviceSheets/update/<int:id>')
+@login_required
 def update_service_sheet(id):
     if current_user.role_user != UserRole.KY_THUAT_VIEN:
         return redirect('/')
@@ -282,26 +301,40 @@ def update_service_sheet(id):
     hind = False
     kw = request.args.get("search")
     status = request.args.get("status")
-    appointment_details = get_appointment_details(therapist_id=current_user.id)
+
+    therapist = KyThuatVien.query.get(current_user.id)
+    therapist_busy_time = get_busy_time(therapist_id=therapist.user.id)
+    service_now = present_service(id)
+    service_next = next_service(id)
+
     if status == None:
         status = 'KTV'
     elif status == 'DA_XAC_NHAN':
         hind = True
+
     page = int(request.args.get("page", id))
-    pages = math.ceil(count_appointments(status=status, kw=kw, hind=hind, appointment_details=appointment_details) / app.config["PAGE_SIZE"])
-    appointments = load_appointments(status=status, kw=kw, page=page, hind=hind, appointment_details=appointment_details)
+    pages = math.ceil(count_appointments(status=status, kw=kw, hind=hind, appointments=therapist_busy_time) / app.config["PAGE_SIZE"])
+    appointments = load_appointments(status=status, kw=kw, page=page, hind=hind, appointments=therapist_busy_time)
+
     appointment_details = get_appointment_details(appointment_id=id)
     service_sheet_details = None
+
     if load_service_sheets(appointment_id=id):
         sheet = load_service_sheets(appointment_id=id)
         service_sheet_details = get_service_sheet_details(service_sheet_id=sheet.id)
+
     return render_template("serviceSheets.html", pages=pages, page=page, id=id, kw=kw, status=status, flag=flag,
                            service_sheet_details=service_sheet_details,
                            appointments=appointments,
-                           appointment_details=appointment_details)
+                           appointment_details=appointment_details,
+                           therapist_busy_time=therapist_busy_time,
+                           user=therapist,
+                           service_now=service_now,
+                           service_next=service_next)
 
 
 @app.route('/serviceSheets/update/<int:id>/success', methods=['POST'])
+@login_required
 def success_service_sheet(id):
     if current_user.role_user != UserRole.KY_THUAT_VIEN:
         return redirect('/')
@@ -317,6 +350,7 @@ def success_service_sheet(id):
 
 
 @app.route('/invoices/<int:id>')
+@login_required
 def invoice(id):
     if current_user.role_user != UserRole.THU_NGAN:
         return redirect('/')
@@ -364,6 +398,7 @@ def invoice(id):
 
 
 @app.route('/invoices/<int:id>/add_discount', methods=['PUT'])
+@login_required
 def add_discount(id):
     if current_user.role_user != UserRole.THU_NGAN:
         return redirect('/')
@@ -389,6 +424,7 @@ def add_discount(id):
 
 
 @app.route('/invoices/<int:id>/remove_discount', methods=['PUT'])
+@login_required
 def remove_discount(id):
     if current_user.role_user != UserRole.THU_NGAN:
         return redirect('/')
@@ -409,6 +445,7 @@ def remove_discount(id):
 
 
 @app.route('/invoices/<int:id>/payment')
+@login_required
 def payment(id):
     if current_user.role_user != UserRole.THU_NGAN:
         return redirect('/')
@@ -423,6 +460,7 @@ def payment(id):
 
 
 @app.route('/invoices/<int:id>/payment/success', methods=['POST'])
+@login_required
 def success_pay(id):
     if current_user.role_user != UserRole.THU_NGAN:
         return redirect('/')
@@ -437,7 +475,7 @@ def success_pay(id):
     try:
         add_receipt(customer_id=customer_id, invoice=invoice[str(id)], payment_method=payment_method,
                     temporary=temporary, total_discount=total_discount, total_amount=total_amount,
-                    paid=paid, sheet_id=id, cashier_id=6)
+                    paid=paid, sheet_id=id, cashier_id=customer_id)
     except Exception as ex:
         return jsonify({"status": 500, "err_msg": str(ex)})
     else:

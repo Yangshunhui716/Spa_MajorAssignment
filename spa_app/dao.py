@@ -52,20 +52,26 @@ def get_free_therapists_list(appointment_details):
         end_time = start_time + timedelta(minutes=a.dich_vu.thoi_gian_dich_vu)
         for t in therapists_schedule:
             if(a.ma_dich_vu == t.ky_thuat_vien.dich_vu.id):
-                if(busy_time(t.ma_ky_thuat_vien) < a.dich_vu.gioi_han_khach):
-                    if(busy_time(t.ma_ky_thuat_vien, start_time, end_time)==None):
+                if(get_busy_time(therapist_id=t.ma_ky_thuat_vien, count=True) < a.dich_vu.gioi_han_khach):
+                    if(get_busy_time(therapist_id=t.ma_ky_thuat_vien, start_time=start_time, end_time=end_time)==None):
                         therapists_list.append(t.ky_thuat_vien)
         start_time = end_time
 
     return therapists_list
 
 
-def busy_time(therapist_id, start_time=None, end_time=None):
+def get_busy_time(therapist_id=None, start_time=None, end_time=None, count=False, appointment_id=None):
     if start_time and end_time:
         return ThoiGianKTVBan.query.filter(ThoiGianKTVBan.ma_ky_thuat_vien == therapist_id,
                 start_time < (ThoiGianKTVBan.thoi_gian_ket_thuc),
                 end_time > ThoiGianKTVBan.thoi_gian_bat_dau).first()
-    return ThoiGianKTVBan.query.filter(ThoiGianKTVBan.ma_ky_thuat_vien == therapist_id).count()
+    if count==True:
+        return ThoiGianKTVBan.query.filter(ThoiGianKTVBan.ma_ky_thuat_vien == therapist_id).count()
+    if appointment_id:
+        return (ThoiGianKTVBan.query.filter(ThoiGianKTVBan.ma_dat_lich==appointment_id)
+                .order_by(ThoiGianKTVBan.thoi_gian_ket_thuc.desc()).first())
+    return (ThoiGianKTVBan.query.filter(ThoiGianKTVBan.ma_ky_thuat_vien == therapist_id)
+            .order_by(ThoiGianKTVBan.thoi_gian_bat_dau.asc()).all())
 
 
 def work_shift_appointment(appointment_time):
@@ -105,21 +111,19 @@ def load_services():
     return DichVu.query.all()
 
 
-def load_appointments(appointment_id=None, status=None, kw=None, page=None, hind=False, appointment_details=None):
+def load_appointments(appointment_id=None, status=None, kw=None, page=None, hind=False, appointments=None):
     query = DatLich.query
-    if appointment_details:
-        appointment_id = []
-        for a in appointment_details:
-            appointment_id.append(a.ma_dat_lich)
-        query = query.filter(DatLich.id.in_(appointment_id))
-    else:
-        return
+    if appointments:
+        a_id = []
+        for a in appointments:
+            a_id.append(a.ma_dat_lich)
+        query = query.filter(DatLich.id.in_(a_id))
 
     if kw:
         query = query.filter(DatLich.khach_hang.has(User.ho_ten_user.ilike(f"%{kw}%")))
 
     if appointment_id:
-        return query.filter(DatLich.id.in_(appointment_id)).all()
+        return query.filter(DatLich.id==appointment_id).all()
 
     match status:
         case "CHO_XAC_NHAN":
@@ -174,15 +178,13 @@ def load_appointments(appointment_id=None, status=None, kw=None, page=None, hind
     return query.all()
 
 
-def count_appointments(status=None, kw=None, hind=False, appointment_details=None):
+def count_appointments(status=None, kw=None, hind=False, appointments=None):
     query = DatLich.query
-    if appointment_details:
-        appointment_id = []
-        for a in appointment_details:
-            appointment_id.append(a.ma_dat_lich)
-        query = query.filter(DatLich.id.in_(appointment_id))
-    else:
-        return 1
+    if appointments:
+        a_id = []
+        for a in appointments:
+            a_id.append(a.ma_dat_lich)
+        query = query.filter(DatLich.id.in_(a_id))
 
     if kw:
         query = query.filter(DatLich.khach_hang.has(User.ho_ten_user.ilike(f"%{kw}%")))
@@ -230,12 +232,12 @@ def get_appointment_details(appointment_id=None, therapist_id=None):
 
 def get_appointment_status(appointment_id):
     a = load_appointments(appointment_id=appointment_id)
-    return a.trang_thai_dat_lich
+    return a[0].trang_thai_dat_lich
 
 
 def change_appointment_status(appointment_id, status):
     a = load_appointments(appointment_id=appointment_id)
-    a.trang_thai_dat_lich = status
+    a[0].trang_thai_dat_lich = status
     db.session.commit()
 
 
@@ -278,7 +280,7 @@ def load_service_sheets(appointment_id=None, sheet_id=None, kw=None, page=None, 
     query = PhieuDichVu.query.join(DatLich)
 
     if kw:
-        query = query.filer(DatLich.khach_hang.has(User.ho_ten_user.ilike(f"%{kw}%")))
+        query = query.filter(DatLich.khach_hang.has(User.ho_ten_user.ilike(f"%{kw}%")))
 
     if appointment_id:
         return query.filter(PhieuDichVu.ma_dat_lich == appointment_id).first()
@@ -307,7 +309,7 @@ def count_service_sheets(kw=None, flag=True):
     query = PhieuDichVu.query.join(DatLich)
 
     if kw:
-        query = query.filer(DatLich.khach_hang.has(User.ho_ten_user.ilike(f"%{kw}%")))
+        query = query.filter(DatLich.khach_hang.has(User.ho_ten_user.ilike(f"%{kw}%")))
 
     if flag is False:
         query = (query.filter(DatLich.trang_thai_dat_lich.in_([

@@ -99,6 +99,7 @@ class KyThuatVien(db.Model):
 
     dat_lich_detail = relationship("DatLichDetail", backref="ky_thuat_vien", lazy=True)
     thoi_gian_bieu = relationship("ThoiGianBieuKTV", backref="ky_thuat_vien", lazy=True)
+    thoi_gian_ban = relationship("ThoiGianKTVBan", backref="ky_thuat_vien", lazy=True)
 
 
 class DatLich(BaseModel):

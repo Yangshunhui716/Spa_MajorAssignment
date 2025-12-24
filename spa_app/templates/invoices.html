@@ -189,6 +189,8 @@
                                     {%for d in receipt_discount%}
                                         {%if d.giam_gia.dich_vu.id == sd.dich_vu.id%}
                                             {{"{:,.0f}".format(d.giam_gia.muc_giam_gia*sd.dich_vu.gia_dich_vu)}}
+                                        {%else%}
+                                            0
                                         {%endif%}
                                     {%endfor%}
                                 {%else%}

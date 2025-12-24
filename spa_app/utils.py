@@ -1,4 +1,5 @@
-from spa_app.dao import get_vat
+from spa_app.dao import get_vat, get_busy_time
+from datetime import datetime
 
 
 def total(invoice):
@@ -21,3 +22,25 @@ def total(invoice):
         "vat": vat.muc_vat,
         "total_amount": total_amount,
     }
+
+
+def present_service(appointment_id):
+    busy_time_of_appointment = get_busy_time(appointment_id=appointment_id)
+    present_time = datetime.now()
+    if busy_time_of_appointment:
+        for b in busy_time_of_appointment:
+            if present_time >= b.thoi_gian_bat_dau:
+                return b
+    return None
+
+
+def next_service(appointment_id):
+    busy_time_of_appointment = get_busy_time(appointment_id=appointment_id)
+    present_time = datetime.now()
+    if busy_time_of_appointment:
+        before=None
+        for b in busy_time_of_appointment:
+            if present_time >= b.thoi_gian_bat_dau:
+                return before
+            before = b
+    return None

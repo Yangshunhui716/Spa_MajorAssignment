@@ -84,7 +84,13 @@
                         {%for a in appointments%}
                         <tr onclick="displaySheetDetail({{a.id}})">
                             <td class="table-first-col">{{a.khach_hang.ho_ten_user}}</td>
-                            <td class="service-sheet-table-col">hehehe</td>
+                            <td class="service-sheet-table-col">
+                                {%for time in therapist_busy_time%}
+                                    {%if a.id == time.ma_đat_lich%}
+                                        {{time.thoi_gian_bat_dau}}
+                                    {%endif%}
+                                {%endfor%}
+                            </td>
                             <td class="service-sheet-table-col">{{a.trang_thai_dat_lich.name}}</td>
                         </tr>
                         {%endfor%}
@@ -131,20 +137,28 @@
                     <div class="subtitle">Khách hàng: {{appointment_details[0].dat_lich.khach_hang.ho_ten_user}}</div>
                     <div class="row row-col-2 text">
                         <div class="col-6 pt-1 gy-1">Dịch vụ hiện tại:
-                            {{appointment_details[0].dich_vu.ten_dich_vu}}
+                            {%if service_now != None%}
+                            {{service_now.ky_thuat_vien.dich_vu.ten_dich_vu}}
+                            {%endif%}
                         </div>
-                        <div class="col-6 pt-1 gy-1">Kỹ thuật viên: {{appointment_details[0].ky_thuat_vien.user.ho_ten_user}}
+                        <div class="col-6 pt-1 gy-1">Kỹ thuật viên:
+                            {%if service_now != None%}
+                            {{service_now.ky_thuat_vien.ho_ten_user}}
+                            {%endif%}
                         </div>
                     </div>
 
                     <div class="row row-col-2 text">
-                        {%if appointment_details[0 + 1] != null%}
                         <div class="col-6 pt-1 gy-1">Dịch vụ kế tiếp:
-                            {{appointment_details[1].dich_vu.ten_dich_vu}}
+                            {%if service_next != None%}
+                            {{service_next.ky_thuat_vien.dich_vu.ten_dich_vu}}
+                            {%endif%}
                         </div>
-                        <div class="col-6 pt-1 gy-1">Kỹ thuật viên: {{appointment_details[1].ky_thuat_vien.user.ho_ten_user}}
+                        <div class="col-6 pt-1 gy-1">Kỹ thuật viên:
+                            {%if service_next != None%}
+                            {{service_next.ky_thuat_vien.ho_ten_user}}
+                            {%endif%}
                         </div>
-                        {%endif%}
                     </div>
 
                 </div>
@@ -153,14 +167,20 @@
                     <div class="pt-3 pb-1">
                         <input type="text" class="form-control border-0" id="serviceNote" style="background: #B2B2B2"
                                readonly
-                               value="{%if service_sheet_details != None%}{{service_sheet_details[0].ghi_chu_ktv}}{%endif%}">
+                               value="{%if service_sheet_details != None%}
+                               {%for s in service_sheet_details%}
+                                    {%if s.ma_dich_vu==user.user.id%}
+                                        {{s.ghi_chu_ktv}}
+                                    {%endif%}
+                               {%endfor%}
+                               {%endif%}">
                     </div>
                 </div>
                 <div class="container position-relative mt-4 mb-4" style="background: #B2B2B2" id="replyArea">
                     <div class="position-absolute translate-middle-y fw-bolder subtitle">Phản hồi của KH về dịch vụ
                     </div>
                     <div class="pt-3 pb-1">
-                        <textarea class="form-control border-0" id="customerReply" style="background: #B2B2B2" readonly>{%if service_sheet_details != None%}{{service_sheet_details[0].phan_hoi_khach_hang}}{%endif%}</textarea>
+                        <textarea class="form-control border-0" id="customerReply" style="background: #B2B2B2" readonly>{%if service_sheet_details != None%}{%for s in service_sheet_details%}{%if s.ma_dich_vu==user.user.id%}{{s.phan_hoi_khach_hang}}{%endif%}{%endfor%}{%endif%}</textarea>
                     </div>
                 </div>
                 {%if appointment_details[0].dat_lich.trang_thai_dat_lich.name == 'DANG_THUC_HIEN' or
@@ -172,7 +192,7 @@
                 </div>
                 {%endif%}
                 <div class="row pb-3" style="display: none" id="btnForUpdate">
-                    <button class="col btn btn-dark me-5 text" onclick="successUpdateSD({{appointment_details[0].dich_vu.id}}
+                    <button class="col btn btn-dark me-5 text" onclick="successUpdateSD({{user.dich_vu_chuyen_mon}}
                     , {{appointment_details[0].dat_lich.id}})">Xác nhận cập nhật
                     </button>
                     <button class="col btn btn-dark ms-5 text" onclick="cancelUpdateSD({{id}})">

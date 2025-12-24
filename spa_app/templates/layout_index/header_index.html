@@ -2,7 +2,7 @@
     <div>
         <nav class="nav-masthead d-flex align-items-center text-white p-2">
             <!-- Logo bên trái -->
-            <h3 class="mb-0">Logo</h3>
+            <a class="navbar-brand content-left align-items-center text-white fw-bolder" href="/">VỊ SPA</a>
 
             <!-- Menu nav ở giữa -->
             <div class="nav justify-content-center flex-grow-1">
@@ -12,6 +12,17 @@
                    href="{{ url_for('index_services') }}">DỊCH VỤ</a>
                 <a class="nav-link text-white {% if request.endpoint == 'contact' %}active{% endif %}"
                    href="#footer-main">LIÊN HỆ</a>
+                {%if current_user.is_authenticated%}
+                    {%if current_user.role_user.name == 'LE_TAN'%}
+                        <a class="nav-link text-white" href="/appointments/0?page=1&status=LE_TAN">TRANG LỄ TÂN</a>
+                    {%endif%}
+                    {%if current_user.role_user.name == 'KY_THUAT_VIEN'%}
+                        <a class="nav-link text-white" href="/serviceSheets/0?page=1&status=KTV">TRANG KỸ THUẬT VIÊN</a>
+                    {%endif%}
+                    {%if current_user.role_user.name == 'THU_NGAN'%}
+                        <a class="nav-link text-white" href="/invoices/0?page=1">TRANG THU NGÂN</a>
+                    {%endif%}
+                {%endif%}
             </div>
             <!-- Sign In bên phải -->
             {% if current_user.is_authenticated%}
@@ -27,9 +38,6 @@
                 <a class="nav-link text-white" href="{{ url_for('login') }}">SIGN IN</a>
             </div>
             {%endif%}
-
         </nav>
-
-
     </div>
 </header>
