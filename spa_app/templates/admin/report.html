@@ -1,0 +1,79 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+
+<h3>📊 BÁO CÁO THỐNG KÊ (PHIẾU DỊCH VỤ)</h3>
+
+<hr>
+
+<h5>1️⃣ Doanh thu theo tháng</h5>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Tháng</th>
+        <th>Doanh thu</th>
+    </tr>
+    {% for thang, doanh_thu in doanh_thu_thang %}
+    <tr>
+        <td>{{ thang }}</td>
+        <td>{{ "{:,.0f}".format(doanh_thu or 0) }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<canvas id="doanhThuChart" width="300" height="100"></canvas>
+
+<hr>
+
+<h5>2️⃣ Tần suất sử dụng dịch vụ</h5>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Tháng</th>
+        <th>Dịch vụ</th>
+        <th>Số lần</th>
+    </tr>
+    {% for thang, ten_dv, so_lan in tan_suat_dich_vu %}
+    <tr>
+        <td>{{ thang }}</td>
+        <td>{{ ten_dv }}</td>
+        <td>{{ so_lan }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% for thang, dv in tan_suat_chart.items() %}
+<h6>{{ thang }}</h6>
+    <canvas width="10px" id="chart_{{ loop.index }}"></canvas>
+{% endfor %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const doanhThu = {{ doanh_thu_chart | tojson }};
+    new Chart(document.getElementById('doanhThuChart'), {
+        type: 'bar',
+        data: {
+            labels: doanhThu.labels,
+            datasets: [{
+                label: 'Doanh thu',
+                data: doanhThu.data
+            }]
+        }
+    });
+
+    const tanSuat = {{ tan_suat_chart | tojson }};
+    let i = 1;
+    for (const [thang, dv] of Object.entries(tanSuat)) {
+        new Chart(document.getElementById('chart_' + i), {
+            type: 'pie',
+            data: {
+                labels: Object.keys(dv),
+                datasets: [{
+                    data: Object.values(dv)
+                }]
+            }
+        });
+        i++;
+    }
+</script>
+
+{% endblock %}

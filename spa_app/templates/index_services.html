@@ -37,51 +37,19 @@
                 <div class="service-box">
                     <h4 class="mb-3">Dịch Vụ Làm Đẹp</h4>
                     <ul class="list-unstyled text-start">
+                        {%for dv in dich_vu_list%}
                         <li>
-                            <a data-bs-toggle="collapse" href="#munThamNam">
-                                Điều trị mụn – thâm – nám
+                            <a data-bs-toggle="collapse" href="#m{{dv.id}}">
+                                {{dv.ten_dich_vu}} {{dv.id}}
                             </a>
-                            <div class="collapse mt-2" id="munThamNam">
-                                <p>Liệu trình điều trị chuyên sâu bằng công nghệ hiện đại, giúp giảm mụn và mờ thâm
-                                    nám.</p>
-                            </div>
-                        </li>
+                            <div class="collapse mt-1" id="m{{dv.id}}">
+                                <p>{{dv.mo_ta}}</p>
+                                <p>Giá dịch vụ là: {{dv.gia_dich_vu}}</p>
+                                <p>Thời gian dịch vụ là: {{dv.thoi_gian_dich_vu}}</p>
 
-                        <li>
-                            <a data-bs-toggle="collapse" href="#trietLong">
-                                Triệt lông công nghệ cao
-                            </a>
-                            <div class="collapse mt-2" id="trietLong">
-                                <p>Sử dụng công nghệ laser tiên tiến, an toàn và hiệu quả lâu dài.</p>
                             </div>
                         </li>
-
-                        <li>
-                            <a data-bs-toggle="collapse" href="#chamSocDa">
-                                Chăm sóc da mặt chuyên sâu
-                            </a>
-                            <div class="collapse mt-2" id="chamSocDa">
-                                <p>Liệu trình dưỡng da, làm sạch và tái tạo da mặt, giúp da sáng khỏe.</p>
-                            </div>
-                        </li>
-
-                        <li>
-                            <a data-bs-toggle="collapse" href="#phunXam">
-                                Phun xăm thẩm mỹ
-                            </a>
-                            <div class="collapse mt-2" id="phunXam">
-                                <p>Dịch vụ phun xăm tự nhiên, an toàn, tạo đường nét sắc sảo cho khuôn mặt.</p>
-                            </div>
-                        </li>
-
-                        <li>
-                            <a data-bs-toggle="collapse" href="#noiMi">
-                                Nối mi
-                            </a>
-                            <div class="collapse mt-2" id="noiMi">
-                                <p>Kỹ thuật nối mi hiện đại, tạo hàng mi cong dài và quyến rũ.</p>
-                            </div>
-                        </li>
+                        {%endfor%}
                     </ul>
                 </div>
 

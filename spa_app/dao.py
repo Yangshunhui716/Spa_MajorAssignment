@@ -23,19 +23,31 @@ def auth_user(username, password):
     print(" - user found:", user)
     return user
 
-def add_user(name, username,password,avatar, email, phone):
+
+def add_user(name, username, password, email, phone):
     password = hashlib.md5(password.encode('utf-8')).hexdigest()
-    u = User(ho_ten_user = name , password_user = password, sdt_user = phone, email_user = email,tai_khoan_user = username)
+    u = User(ho_ten_user=name, password_user=password, sdt_user=phone, email_user=email, tai_khoan_user=username)
     db.session.add(u)
     db.session.commit()
+
 
 def get_user_by_id(user_id):
     return User.query.get(user_id)
 
+
+def get_user_by_phone(sdt_user):
+    return User.query.filter_by(sdt_user=sdt_user).first()
+
+
+def get_user_by_username(username):
+    return User.query.filter_by(tai_khoan_user=username).first()
+
+
 def is_ky_thuat_vien(user_id):
-    return db.session.query(KyThuatVien)\
-        .filter(KyThuatVien.ma_ktv == user_id)\
+    return db.session.query(KyThuatVien) \
+        .filter(KyThuatVien.ma_ktv == user_id) \
         .first()
+
 
 def load_therapists(therapist_id):
     if therapist_id:
@@ -47,15 +59,15 @@ def get_free_therapists_list(appointment_details):
     appointment = appointment_details[0].dat_lich
     work_shift = work_shift_appointment(appointment.gio_hen)
     therapists_schedule = load_schedule(appointment.gio_hen, work_shift)
-    therapists_list=[]
+    therapists_list = []
 
     start_time = appointment.gio_hen
     for a in appointment_details:
         end_time = start_time + timedelta(minutes=a.dich_vu.thoi_gian_dich_vu)
         for t in therapists_schedule:
-            if(a.ma_dich_vu == t.ky_thuat_vien.dich_vu.id):
-                if(busy_time(t.ma_ky_thuat_vien) < a.dich_vu.gioi_han_khach):
-                    if(busy_time(t.ma_ky_thuat_vien, start_time, end_time)==None):
+            if (a.ma_dich_vu == t.ky_thuat_vien.dich_vu.id):
+                if (busy_time(t.ma_ky_thuat_vien) < a.dich_vu.gioi_han_khach):
+                    if (busy_time(t.ma_ky_thuat_vien, start_time, end_time) == None):
                         therapists_list.append(t.ky_thuat_vien)
         start_time = end_time
 
@@ -65,8 +77,8 @@ def get_free_therapists_list(appointment_details):
 def busy_time(therapist_id, start_time=None, end_time=None):
     if start_time and end_time:
         return ThoiGianKTVBan.query.filter(ThoiGianKTVBan.ma_ky_thuat_vien == therapist_id,
-                start_time < (ThoiGianKTVBan.thoi_gian_ket_thuc),
-                end_time > ThoiGianKTVBan.thoi_gian_bat_dau).first()
+                                           start_time < (ThoiGianKTVBan.thoi_gian_ket_thuc),
+                                           end_time > ThoiGianKTVBan.thoi_gian_bat_dau).first()
     return ThoiGianKTVBan.query.filter(ThoiGianKTVBan.ma_ky_thuat_vien == therapist_id).count()
 
 
@@ -120,20 +132,21 @@ def load_appointments(appointment_id=None, status=None, kw=None, page=None, hind
             query = (query.filter(DatLich.trang_thai_dat_lich == "CHO_XAC_NHAN")
                      .order_by(DatLich.ngay_tao.asc(), DatLich.gio_hen.asc()))
         case "DA_XAC_NHAN":
-            if hind==True:
+            if hind == True:
                 query = query.filter(DatLich.trang_thai_dat_lich == "DA_XAC_NHAN",
-                        cast(DatLich.gio_hen, Date) == datetime.now().date()).order_by(DatLich.gio_hen.asc())
+                                     cast(DatLich.gio_hen, Date) == datetime.now().date()).order_by(
+                    DatLich.gio_hen.asc())
             else:
                 query = (query.filter(DatLich.trang_thai_dat_lich == "DA_XAC_NHAN")
-                     .order_by(case((cast(DatLich.gio_hen, Date) == datetime.now().date(), 0), else_=1)
-                    , DatLich.gio_hen.desc()))
+                         .order_by(case((cast(DatLich.gio_hen, Date) == datetime.now().date(), 0), else_=1)
+                                   , DatLich.gio_hen.desc()))
         case "DANG_THUC_HIEN":
             query = (query.filter(DatLich.trang_thai_dat_lich == "DANG_THUC_HIEN")
                      .order_by(DatLich.gio_hen.asc()))
         case "DA_HOAN_THANH":
             query = (query.filter(DatLich.trang_thai_dat_lich == "DA_HOAN_THANH",
-                    cast(DatLich.gio_hen, Date) == datetime.now().date())
-                    .order_by(DatLich.gio_hen.desc()))
+                                  cast(DatLich.gio_hen, Date) == datetime.now().date())
+                     .order_by(DatLich.gio_hen.desc()))
         case "DA_HUY":
             query = (query.filter(DatLich.trang_thai_dat_lich == "DA_HUY")
                      .order_by(DatLich.gio_hen.desc()))
@@ -177,16 +190,16 @@ def count_appointments(status=None, kw=None, hind=False):
         case "CHO_XAC_NHAN":
             query = query.filter(DatLich.trang_thai_dat_lich == "CHO_XAC_NHAN")
         case "DA_XAC_NHAN":
-            if hind==True:
+            if hind == True:
                 query = query.filter(DatLich.trang_thai_dat_lich == "DA_XAC_NHAN",
-                        cast(DatLich.gio_hen, Date) == datetime.now().date())
+                                     cast(DatLich.gio_hen, Date) == datetime.now().date())
             else:
                 query = query.filter(DatLich.trang_thai_dat_lich == "DA_XAC_NHAN")
         case "DANG_THUC_HIEN":
             query = query.filter(DatLich.trang_thai_dat_lich == "DANG_THUC_HIEN")
         case "DA_HOAN_THANH":
             query = query.filter(DatLich.trang_thai_dat_lich == "DA_HOAN_THANH",
-                    cast(DatLich.gio_hen, Date) == datetime.now().date())
+                                 cast(DatLich.gio_hen, Date) == datetime.now().date())
         case "DA_HUY":
             query = query.filter(DatLich.trang_thai_dat_lich == "DA_HUY")
         case "LE_TAN":
@@ -242,11 +255,12 @@ def add_busy_time(appointment_id, selected_therapists):
     start_time = a.gio_hen
     for th in selected_therapists:
         therapist = load_therapists(therapist_id=th["ma_ktv"])
-        end_time = start_time + timedelta(minutes=therapist.dich_vu.thoi_gian_dich_vu+therapist.dich_vu.thoi_gian_nghi_ngoi)
-        busy = ThoiGianKTVBan(ma_ky_thuat_vien = therapist.user.id, ma_dat_lich = a.id,
+        end_time = start_time + timedelta(
+            minutes=therapist.dich_vu.thoi_gian_dich_vu + therapist.dich_vu.thoi_gian_nghi_ngoi)
+        busy = ThoiGianKTVBan(ma_ky_thuat_vien=therapist.user.id, ma_dat_lich=a.id,
                               thoi_gian_bat_dau=start_time, thoi_gian_ket_thuc=end_time)
         db.session.add(busy)
-        start_time=end_time - timedelta(minutes=therapist.dich_vu.thoi_gian_nghi_ngoi)
+        start_time = end_time - timedelta(minutes=therapist.dich_vu.thoi_gian_nghi_ngoi)
     db.session.commit()
 
 
@@ -375,7 +389,8 @@ def get_receipt(service_sheet_id):
     return HoaDon.query.filter(HoaDon.ma_phieu_dich_vu == service_sheet_id).first()
 
 
-def add_receipt(customer_id, invoice, sheet_id, cashier_id, payment_method, temporary, total_discount, total_amount, paid):
+def add_receipt(customer_id, invoice, sheet_id, cashier_id, payment_method, temporary, total_discount, total_amount,
+                paid):
     receipt = HoaDon(ma_thu_ngan=cashier_id, ma_phieu_dich_vu=sheet_id,
                      ma_vat=get_vat().id, phuong_thuc_thanh_toan=payment_method,
                      tong_gia_dich_vu=temporary, tong_giam_gia=total_discount,

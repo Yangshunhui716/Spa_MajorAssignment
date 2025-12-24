@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const bookingBtn = document.getElementById('booking-btn');
   const icon = document.getElementById("schedule-icon");
 
+
   // Mở overlay khi click icon 📅
   if(icon){
     icon.addEventListener("click", () => {
@@ -20,37 +21,41 @@ document.addEventListener('DOMContentLoaded', () => {
       overlay.style.display = "none";
     }
   });
+    function createServiceItem() {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'd-flex align-items-center mb-2 service-item';
 
-  // Tạo item dịch vụ
-  function createServiceItem() {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'd-flex align-items-center mb-2 service-item';
+      const select = document.createElement('select');
+      select.className = 'form-select service-select';
 
-    const select = document.createElement('select');
-    select.className = 'form-select service-select';
-    select.innerHTML = `
-      <option value="20">Massage Mặt - 20 phút</option>
-      <option value="30">Điều trị mụn - 30 phút</option>
-      <option value="25">Triệt lông - 25 phút</option>
-    `;
+      list_services.forEach(dv => {
+        const option = document.createElement('option');
+        option.value = dv.id;
+        option.textContent = `${dv.ten} - ${dv.thoi_gian} phút`;
+        option.dataset.time = dv.thoi_gian;
+        select.appendChild(option);
+      });
 
-    const removeBtn = document.createElement('button');
-    removeBtn.type = 'button';
-    removeBtn.className = 'remove-btn';
-    removeBtn.innerHTML = '×';
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'remove-btn';
+      removeBtn.innerHTML = '×';
 
-    wrapper.appendChild(select);
-    wrapper.appendChild(removeBtn);
-    return wrapper;
-  }
+      wrapper.appendChild(select);
+      wrapper.appendChild(removeBtn);
+      return wrapper;
+    }
 
-  // Cập nhật tổng thời gian
-  function updateDuration() {
-    const selects = serviceList.querySelectorAll('.service-select');
-    let total = 0;
-    selects.forEach(s => total += parseInt(s.value, 10));
-    durationEl.textContent = total + ' phút';
-  }
+     function updateDuration() {
+      let total = 0;
+      const inputs = hiddenContainer.querySelectorAll("input[name='list_services[]']");
+
+      inputs.forEach(input => {
+        total += parseInt(input.dataset.time || 0);
+      });
+
+      durationEl.textContent = total + " phút";
+    }
 
   // Cập nhật trạng thái nút xoá
   function updateRemoveButtons() {

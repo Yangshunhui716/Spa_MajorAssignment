@@ -116,6 +116,9 @@
                 <label for="confirm_password_user">Nhập Lại Mật khẩu</label>
                 <input name="confirm_password" type="password" id="confirm_password_user" required>
             </div>
+            {% if err_msg%}
+            <div class="alert alert-danger">{{err_msg}}</div>
+            {% endif %}
             <button class="btn-danger" type="submit">Đăng ký</button>
         </form>
         <div class="toggle">
