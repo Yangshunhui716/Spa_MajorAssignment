@@ -1,7 +1,5 @@
 function displayAppointmentDetail(appointmentId){
-    if(!window.location.href.includes("update/"+appointmentId)){
-        window.location.href = "/appointments/" + appointmentId + window.location.search;
-    }
+    window.location.href = "/appointments/" + appointmentId + window.location.search;
 }
 
 function closeAppointmentDetail(){
