@@ -6,7 +6,6 @@ from spa_app import db, app
 from enum import Enum as RoleEnum
 
 class UserRole(RoleEnum):
-    USER = "USER"
     KHACH_HANG = "Khach_Hang"
     LE_TAN = "Le_Tan"
     THU_NGAN = "Thu_Ngan"
@@ -51,11 +50,11 @@ class BaseModel(db.Model):
 
 class User(UserMixin, BaseModel ):
     ho_ten_user = Column(String(150), nullable=False)
-    sdt_user = Column(Integer, nullable=False, unique=True)
+    sdt_user = Column(String(100), nullable=False, unique=True)
     email_user = Column(String(150), nullable=False)
     tai_khoan_user = Column(String(50), unique=True)
     password_user = Column(String(50))
-    role_user = Column(Enum(UserRole), nullable=False, default=UserRole.USER)
+    role_user = Column(Enum(UserRole), nullable=False, default=UserRole.KHACH_HANG)
 
     dat_lich_khach_hang = relationship(
         "DatLich",
@@ -73,6 +72,11 @@ class User(UserMixin, BaseModel ):
         lazy=True
     )
 
+    ma_giam_gia = relationship("KhachHangMaGiamGia", backref="user", lazy=True)
+
+    def __str__(self):
+        return self.ho_ten_user
+
 class DichVu(BaseModel):
     ten_dich_vu = Column(String(150), nullable=False, unique=True)
     mo_ta = Column(String(150))
@@ -86,6 +90,9 @@ class DichVu(BaseModel):
     ma_giam_gia = relationship("MaGiamGia", backref="dich_vu", lazy=True)
     ky_thuat_vien = relationship("KyThuatVien", backref="dich_vu", lazy=True)
 
+    def __str__(self):
+        return self.ten_dich_vu
+
 class KyThuatVien(db.Model):
     ma_ktv = Column(Integer, ForeignKey(User.id, ondelete='CASCADE'), primary_key=True, nullable=False)
     dich_vu_chuyen_mon = Column(Integer, ForeignKey(DichVu.id), nullable=False)
@@ -93,6 +100,9 @@ class KyThuatVien(db.Model):
     dat_lich_detail = relationship("DatLichDetail", backref="ky_thuat_vien", lazy=True)
     thoi_gian_bieu = relationship("ThoiGianBieuKTV", backref="ky_thuat_vien", lazy=True)
     thoi_gian_ban = relationship("ThoiGianKTVBan", backref="ky_thuat_vien", lazy=True)
+
+    def __str__(self):
+        return self.user.ho_ten_user
 
 class DatLich(BaseModel):
     trang_thai_dat_lich = Column(Enum(TrangThaiDatLich), nullable=False, default=TrangThaiDatLich.CHO_XAC_NHAN)
@@ -161,12 +171,19 @@ class MaGiamGia(BaseModel):
     ma_dich_vu = Column(Integer, ForeignKey(DichVu.id, ondelete='CASCADE'), nullable=False)
 
     hoa_don_ma_giam_gia = relationship("HoaDonMaGiamGia", backref="giam_gia", lazy=True)
+    ma_giam_gia = relationship("KhachHangMaGiamGia", backref="giam_gia", lazy=True)
+
+    def __str__(self):
+        return self.ten_ma_giam_gia
+
 
 
 class KhachHangMaGiamGia(db.Model):
     ma_giam_gia = Column(Integer, ForeignKey(MaGiamGia.id, ondelete='CASCADE'), primary_key=True, nullable=False)
     ma_khach_hang = Column(Integer, ForeignKey(User.id, ondelete='CASCADE'), primary_key=True, nullable=False)
     trang_thai = Column(Enum(TrangThaiMaGiamGiaEnum), nullable=False, default=TrangThaiMaGiamGiaEnum.CHUA_SU_DUNG)
+
+
 
 
 class HoaDon(BaseModel):

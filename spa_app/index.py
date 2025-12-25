@@ -89,7 +89,7 @@ def login():
             if role == UserRole.QUAN_LY:
                 return redirect((url_for("admin.index")))
 
-            if role == UserRole.USER:
+            if role == UserRole.KHACH_HANG:
                 return redirect((url_for("index")))
 
             if role == UserRole.KY_THUAT_VIEN:
