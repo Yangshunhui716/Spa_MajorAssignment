@@ -1,1 +1,1 @@
-# Spa_MajorAssignment
+# Spa Management System
